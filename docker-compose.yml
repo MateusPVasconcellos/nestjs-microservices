@@ -1,0 +1,79 @@
+version: "3"
+services:
+  krakend_ce:
+    # The :watch image restarts the service automatically when the configuration files change.
+    # Do not use this image in production, it's meant to speed up your testing and development.
+    image: devopsfaith/krakend:watch
+    volumes:
+      - ./krakend:/etc/krakend
+    ports:
+      - "1234:1234"
+      - "8080:8080"
+      - "8090:8090"
+    command: ["run", "-d", "-c", "/etc/krakend/krakend.json"]
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+    container_name: store-redis
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+
+  auth:
+    build:
+      context: auth
+    ports:
+      - "8000:8000"
+  user:
+    build:
+      context: user
+    ports:
+      - "8010:8010"
+  event:
+    build:
+      context: event
+    ports:
+      - "8020:8020"
+
+  auth-db:
+    image: postgres:14
+    container_name: auth-db
+    restart: always
+    tty: true
+    ports:
+      - "5434:5432"
+    volumes:
+      - .docker/auth/dbdata:/var/lib/postgresql/data:z
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: auth-db
+
+  user-db:
+    image: postgres:14
+    container_name: user-db
+    restart: always
+    tty: true
+    ports:
+      - "5433:5432"
+    volumes:
+      - .docker/user/dbdata:/var/lib/postgresql/data:z
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: user-db
+
+  event-db:
+    image: postgres:14
+    container_name: event-db
+    restart: always
+    tty: true
+    ports:
+      - "5435:5432"
+    volumes:
+      - .docker/event/dbdata:/var/lib/postgresql/data:z
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: event-db

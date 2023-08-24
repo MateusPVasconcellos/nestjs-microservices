@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  time        DateTime
+  description String   @db.VarChar(500)
+  user_id     String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  eventAddress EventAddress?
+  eventJob     EventJob[]
+
+  @@index([id, time, user_id])
+}
+
+model EventAddress {
+  id         String   @id @default(cuid())
+  cep        String   @db.Char(8)
+  uf         String   @db.Char(2)
+  address    String   @db.VarChar(100)
+  city       String   @db.VarChar(50)
+  number     String   @db.VarChar(50)
+  district   String   @db.VarChar(50)
+  event_id   String   @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  event Event @relation(fields: [event_id], references: [id], onDelete: Cascade)
+
+  @@index([event_id, uf, city, district])
+}
+
+model EventJob {
+  id           String   @id @default(cuid())
+  event_id     String
+  description  String   @db.VarChar(500)
+  name         String   @db.VarChar(50)
+  payment_hour Decimal  @db.Decimal(8, 2)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  eventCandidate    EventCandidate[]
+  eventCollaborator EventCollaborator[]
+
+  event Event @relation(fields: [event_id], references: [id], onDelete: Cascade)
+
+  @@index([id, event_id, name, payment_hour])
+}
+
+model EventCandidate {
+  user_id    String
+  job_id     String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  job EventJob @relation(fields: [job_id], references: [id], onDelete: Cascade)
+
+  @@id([user_id, job_id])
+  @@index([user_id, job_id])
+}
+
+model EventCollaborator {
+  user_id    String
+  job_id     String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  job EventJob @relation(fields: [job_id], references: [id], onDelete: Cascade)
+
+  @@id([user_id, job_id])
+  @@index([user_id, job_id])
+}

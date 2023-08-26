@@ -20,10 +20,13 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@nestjs-modules/mailer": "^1.9.1",
     "@nestjs/bull": "^10.0.1",
     "@nestjs/common": "^9.4.3",
     "@nestjs/config": "^3.0.0",
     "@nestjs/core": "^9.4.3",
+    "@nestjs/jwt": "^10.1.0",
+    "@nestjs/microservices": "^9.4.3",
     "@nestjs/platform-express": "^9.4.3",
     "@prisma/client": "^5.1.1",
     "bull": "^4.11.3",

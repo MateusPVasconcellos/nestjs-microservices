@@ -1,13 +1,13 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { AppService } from './app.service';
-import { CreateUserDto } from './shared/dto/create-user.dto';
+import { MessagePattern } from '@nestjs/microservices';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Post('signup')
-  signup(@Body() createUserDto: CreateUserDto) {
-    return this.appService.signup(createUserDto);
+  @MessagePattern({ cmd: 'generate-tokens' })
+  generateTokens(data: any) {
+    return this.appService.generateTokens(data.user_id, data.email);
   }
 }

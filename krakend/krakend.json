@@ -2,16 +2,31 @@
 	"$schema": "https://www.krakend.io/schema/v2.4/krakend.json",
 	"version": 3,
 	"port": 8080,
-	"host": ["http://localhost:8080"],
 	"timeout": "3000ms",
 	"cache_ttl": "300s",
 	"endpoints": [
 		{
+			"@comment": "User Signup",
+			"endpoint": "/signup",
+			"method": "POST",
+			"backend": [
+				{
+					"host": ["http://192.168.1.7:8010"],
+					"url_pattern": "/signup",
+					"encoding": "string"
+				}
+			]
+		},
+		{
+			"@comment": "User Signin",
 			"endpoint": "/signin",
 			"method": "POST",
 			"backend": [
 				{
-					"url_pattern": "/signin"
+					"host": ["http://192.168.1.7:8010"],
+					"method": "POST",
+					"url_pattern": "/signin",
+					"encoding": "json"
 				}
 			]
 		}

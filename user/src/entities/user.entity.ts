@@ -1,4 +1,3 @@
-import { UserRefreshToken } from 'src/auth/domain/entities/user-refresh-token.entity';
 import { UserAddress } from './userAddress.entity';
 import { UserDetail } from './userDetail.entity';
 import { UserRole } from './userRole.entity';
@@ -12,6 +11,5 @@ export class User {
 
   readonly userDetail?: UserDetail;
   readonly userAddress?: UserAddress;
-  readonly userRefreshToken?: UserRefreshToken;
   readonly userRole?: UserRole;
 }

@@ -1,0 +1,15 @@
+{
+	"keys": [{
+		"kid": "access",
+		"kty": "oct",
+		"k": "c2VjcmV0",
+		"alg": "HS256"
+	},
+	{
+		"kid": "refresh",
+		"kty": "oct",
+		"k": "c2VjcmV0",
+		"alg": "HS256"
+	}
+	]
+}

@@ -1,22 +1,25 @@
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   Inject,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import {
   USERS_REPOSITORY_TOKEN,
   UsersRepository,
 } from './repositories/user.repository.interface';
-import * as bcrypt from 'bcrypt';
 import { UserProducerService } from './jobs/user-producer.service';
 import { UserCreatedEvent } from './events/user-created.event';
 import { SigninDto } from './shared/dtos/signin.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
+import { validate } from 'class-validator';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
-export class AppService {
+export class UsersService {
   constructor(
     @Inject('AUTH_SERVICE')
     private readonly authClient: ClientProxy,
@@ -77,5 +80,45 @@ export class AppService {
         new UserCreatedEvent(createUserDto.name, createUserDto.email),
       );
     }
+  }
+
+  async findAll() {
+    const users = await this.usersRepository.findMany({
+      include: { userDetail: true, userAddress: true },
+    });
+    return users;
+  }
+
+  async validateUser(email: string, password: string) {
+    const loginRequestBody = new SigninDto();
+    loginRequestBody.email = email;
+    loginRequestBody.password = password;
+
+    const validations = await validate(loginRequestBody);
+
+    if (validations.length) {
+      throw new BadRequestException(
+        validations.reduce((acc, curr) => {
+          return [...acc, ...Object.values(curr.constraints)];
+        }, []),
+      );
+    }
+
+    const user = await this.usersRepository.findOne({
+      where: { email },
+    });
+
+    if (user) {
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+
+      if (isPasswordValid) {
+        return {
+          ...user,
+          password: undefined,
+        };
+      }
+    }
+
+    throw new UnauthorizedException();
   }
 }

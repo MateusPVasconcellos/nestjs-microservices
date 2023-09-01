@@ -2,7 +2,7 @@
 	"$schema": "https://www.krakend.io/schema/v2.4/krakend.json",
 	"version": 3,
 	"port": 8080,
-	"timeout": "3000ms",
+	"timeout": "30000ms",
 	"cache_ttl": "300s",
 	"endpoints": [
 		{
@@ -11,7 +11,7 @@
 			"method": "POST",
 			"backend": [
 				{
-					"host": ["http://192.168.1.7:8010"],
+					"host": ["http://192.168.1.5:8010"],
 					"url_pattern": "/signup",
 					"encoding": "string"
 				}
@@ -23,10 +23,64 @@
 			"method": "POST",
 			"backend": [
 				{
-					"host": ["http://192.168.1.7:8010"],
+					"host": ["http://192.168.1.5:8010"],
 					"method": "POST",
 					"url_pattern": "/signin",
-					"encoding": "json"
+					"encoding": "safejson"
+				}
+			]
+		},
+		{
+			"@comment": "User Find All",
+			"endpoint": "/users",
+			"method": "GET",
+			"extra_config": {
+				"auth/validator": {
+					"alg": "HS256",
+					"jwk_local_path": "./jwk.txt",
+					"operation_debug": true,
+					"disable_jwk_security": true
+				}
+			},
+			"backend": [
+				{
+					"host": ["http://192.168.1.5:8010"],
+					"method": "GET",
+					"url_pattern": "/users",
+					"encoding": "safejson",
+					"is_collection": true,
+					"extra_config": {
+						"proxy": {
+							"flatmap_filter": [
+								{ "type": "del", "args": ["collection.*.password"] },
+								{
+									"type": "move",
+									"args": ["collection", "users"]
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"@comment": "Refresh",
+			"endpoint": "/refresh",
+			"method": "GET",
+			"extra_config": {
+				"auth/validator": {
+					"alg": "HS256",
+					"jwk_local_path": "./jwk.txt",
+					"operation_debug": true,
+					"disable_jwk_security": true
+				}
+			},
+			"backend": [
+				{
+					"host": ["http://192.168.1.5:8000"],
+					"method": "GET",
+					"url_pattern": "/refresh",
+					"encoding": "safejson"
 				}
 			]
 		}

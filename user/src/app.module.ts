@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { UsersController } from './app.controller';
+import { UsersService } from './app.service';
 import { PrismaService } from './database/prisma.service';
 import redisConfig from './config/redis.config';
 import { ConfigModule, ConfigService, ConfigType } from '@nestjs/config';
@@ -8,6 +8,7 @@ import { BullModule } from '@nestjs/bull';
 import { provideUsersRepository } from './repositories/user.repository.provider';
 import { UserProducerService } from './jobs/user-producer.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { LocalStrategy } from './strategies/local.strategy';
 
 @Module({
   imports: [
@@ -35,12 +36,13 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
       },
     ]),
   ],
-  controllers: [AppController],
+  controllers: [UsersController],
   providers: [
-    AppService,
+    UsersService,
     PrismaService,
     ...provideUsersRepository(),
     UserProducerService,
+    LocalStrategy,
   ],
   exports: [UserProducerService],
 })

@@ -23,16 +23,28 @@ export class JwtService {
       jti: jwtJti,
     };
 
+    const accessTokenHeader = {
+      alg: 'HS256',
+      kid: 'access',
+    };
+
+    const refreshTokenHeader = {
+      alg: 'HS256',
+      kid: 'refresh',
+    };
+
     const [access_token, refresh_token] = [
       this.jwtNest.sign(tokenPayload, {
         privateKey: this.configService.get('jwt.accessPrivateKey'),
         expiresIn: this.configService.get('jwt.accessExpiresIn'),
-        algorithm: 'RS256',
+        algorithm: 'HS256',
+        header: accessTokenHeader,
       }),
       this.jwtNest.sign(refreshTokenPayload, {
         privateKey: this.configService.get('jwt.refreshPrivateKey'),
         expiresIn: this.configService.get('jwt.refreshExpiresIn'),
-        algorithm: 'RS256',
+        algorithm: 'HS256',
+        header: refreshTokenHeader,
       }),
     ];
     return {

@@ -4,6 +4,8 @@
 	"port": 8080,
 	"timeout": "30000ms",
 	"cache_ttl": "300s",
+	"output_encoding": "json",
+	"name": "api-gateway",
 	"endpoints": [
 		{
 			"@comment": "User Signup",
@@ -11,7 +13,7 @@
 			"method": "POST",
 			"backend": [
 				{
-					"host": ["http://192.168.1.5:8010"],
+					"host": ["http://192.168.1.2:8010"],
 					"url_pattern": "/signup",
 					"encoding": "string"
 				}
@@ -23,7 +25,7 @@
 			"method": "POST",
 			"backend": [
 				{
-					"host": ["http://192.168.1.5:8010"],
+					"host": ["http://192.168.1.2:8010"],
 					"method": "POST",
 					"url_pattern": "/signin",
 					"encoding": "safejson"
@@ -44,7 +46,7 @@
 			},
 			"backend": [
 				{
-					"host": ["http://192.168.1.5:8010"],
+					"host": ["http://192.168.1.2:8010"],
 					"method": "GET",
 					"url_pattern": "/users",
 					"encoding": "safejson",
@@ -66,6 +68,7 @@
 		{
 			"@comment": "Refresh",
 			"endpoint": "/refresh",
+			"input_headers": ["*"],
 			"method": "GET",
 			"extra_config": {
 				"auth/validator": {
@@ -77,7 +80,7 @@
 			},
 			"backend": [
 				{
-					"host": ["http://192.168.1.5:8000"],
+					"host": ["http://192.168.1.2:8000"],
 					"method": "GET",
 					"url_pattern": "/refresh",
 					"encoding": "safejson"
@@ -93,7 +96,5 @@
 			"expose_headers": ["Content-Length"],
 			"max_age": "12h"
 		}
-	},
-	"output_encoding": "json",
-	"name": "api-gateway"
+	}
 }

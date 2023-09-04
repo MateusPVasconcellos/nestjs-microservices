@@ -1,0 +1,16 @@
+{
+	"keys": [
+		{
+			"kid": "access",
+			"kty": "oct",
+			"k": "base64secret",
+			"alg": "HS256"
+		},
+		{
+			"kid": "refresh",
+			"kty": "oct",
+			"k": "base64secret",
+			"alg": "HS256"
+		}
+	]
+}

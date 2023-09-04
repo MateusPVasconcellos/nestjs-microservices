@@ -24,13 +24,13 @@ export class JwtService {
     };
 
     const accessTokenHeader = {
-      alg: 'HS256',
       kid: 'access',
+      alg: 'HS256',
     };
 
     const refreshTokenHeader = {
-      alg: 'HS256',
       kid: 'refresh',
+      alg: 'HS256',
     };
 
     const [access_token, refresh_token] = [

@@ -13,6 +13,7 @@ import jwtConfig from './config/jwt.config';
 import redisConfig from './config/redis.config';
 import { provideAuthRepository } from './repositories/auth.repository.provider';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
   providers: [
     AppService,
     PrismaService,
+    JwtRefreshStrategy,
     AuthQueue,
     JwtService,
     ...provideAuthRepository(),

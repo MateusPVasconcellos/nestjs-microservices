@@ -13,6 +13,11 @@ export class AppController {
     return this.appService.generateTokens(data.user_id, data.email);
   }
 
+  @MessagePattern({ cmd: 'generate-activate-token' })
+  generateActivateToken(data: any) {
+    return this.appService.generateActivateToken(data.email);
+  }
+
   @UseGuards(JwtRefreshAuthGuard)
   @Get('refresh')
   refresh(@Request() req: RefreshRequest) {

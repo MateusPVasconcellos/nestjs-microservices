@@ -4,9 +4,7 @@ import { AppService } from './app.service';
 import { PrismaService } from './database/prisma.service';
 import { ConfigModule, ConfigService, ConfigType } from '@nestjs/config';
 import { BullModule } from '@nestjs/bull';
-import { MailerModule, MailerOptions } from '@nestjs-modules/mailer';
 import mailConfig from './config/mail.config';
-import { AuthQueue } from './queues/auth-queue';
 import { JwtService } from './services/jwt.service';
 import { JwtModule } from '@nestjs/jwt';
 import jwtConfig from './config/jwt.config';
@@ -14,6 +12,8 @@ import redisConfig from './config/redis.config';
 import { provideAuthRepository } from './repositories/auth.repository.provider';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
+import { AuthQueue } from './queues/auth-queue';
+import { MailerProducerService } from './jobs/mailer-producer.service';
 
 @Module({
   imports: [
@@ -21,6 +21,9 @@ import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
     ConfigModule.forRoot({ load: [jwtConfig], isGlobal: true }),
     BullModule.registerQueue({
       name: 'authQueue',
+    }),
+    BullModule.registerQueue({
+      name: 'mailerQueue',
     }),
     BullModule.forRootAsync({
       imports: [ConfigModule.forRoot({ load: [redisConfig] })],
@@ -42,30 +45,15 @@ import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
         },
       },
     ]),
-    MailerModule.forRootAsync({
-      imports: [ConfigModule.forRoot({ load: [mailConfig] })],
-      useFactory: (
-        configMail: ConfigType<typeof mailConfig>,
-      ): MailerOptions => ({
-        transport: {
-          host: configMail.host,
-          port: configMail.port,
-          auth: {
-            user: configMail.auth.user,
-            pass: configMail.auth.password,
-          },
-        },
-      }),
-      inject: [mailConfig.KEY],
-    }),
   ],
   controllers: [AppController],
   providers: [
     AppService,
     PrismaService,
     JwtRefreshStrategy,
-    AuthQueue,
     JwtService,
+    AuthQueue,
+    MailerProducerService,
     ...provideAuthRepository(),
   ],
 })

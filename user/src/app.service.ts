@@ -10,7 +10,7 @@ import {
   USERS_REPOSITORY_TOKEN,
   UsersRepository,
 } from './repositories/user.repository.interface';
-import { UserProducerService } from './jobs/user-producer.service';
+import { AuthProducerService } from './jobs/auth-producer.service';
 import { UserCreatedEvent } from './events/user-created.event';
 import { SigninDto } from './shared/dtos/signin.dto';
 import { ClientProxy } from '@nestjs/microservices';
@@ -25,7 +25,7 @@ export class UsersService {
     private readonly authClient: ClientProxy,
     @Inject(USERS_REPOSITORY_TOKEN)
     private readonly usersRepository: UsersRepository,
-    private readonly usersProducer: UserProducerService,
+    private readonly authProducer: AuthProducerService,
   ) {}
 
   async signin(signinDto: SigninDto) {
@@ -49,7 +49,6 @@ export class UsersService {
   async createUser(createUserDto) {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 8);
     createUserDto.password = hashedPassword;
-
     const user = await this.usersRepository.findOne({
       where: { email: createUserDto.email },
       include: { userDetail: true },
@@ -60,7 +59,7 @@ export class UsersService {
       throw new ConflictException();
     }
 
-    const createdUser = await this.usersRepository.create({
+    await this.usersRepository.create({
       data: {
         email: createUserDto.email,
         password: createUserDto.password,
@@ -71,15 +70,12 @@ export class UsersService {
             cpf_cnpj: createUserDto.cpf_cnpj,
           },
         },
-        roleEnum: { connect: { id: 'clllg5l2d0000ty80srs1wnn1' } },
+        roleEnum: { connect: { id: 'clm6xd8f50000tyakoct7s7t8' } },
       },
     });
-
-    if (createdUser) {
-      await this.usersProducer.sendActivateEmail(
-        new UserCreatedEvent(createUserDto.name, createUserDto.email),
-      );
-    }
+    return await this.authProducer.userCreated(
+      new UserCreatedEvent(createUserDto.name, createUserDto.email),
+    );
   }
 
   async findAll() {

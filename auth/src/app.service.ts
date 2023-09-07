@@ -68,4 +68,16 @@ export class AppService {
     tokens.jti = undefined;
     return tokens;
   }
+
+  generateActivateToken(email: string) {
+    const tokenPayload = {
+      email: email,
+    };
+
+    const activateToken = this.jwtService.generateActivateToken(
+      tokenPayload.email,
+    );
+
+    return activateToken;
+  }
 }

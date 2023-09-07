@@ -1,0 +1,46 @@
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { MailerModule, MailerOptions } from '@nestjs-modules/mailer';
+import { ConfigModule, ConfigType } from '@nestjs/config';
+import mailConfig from './config/mail.config';
+import { MailerQueue } from './queues/mailer-queue';
+import { BullModule } from '@nestjs/bull';
+import redisConfig from './config/redis.config';
+
+@Module({
+  imports: [
+    MailerModule.forRootAsync({
+      imports: [ConfigModule.forRoot({ load: [mailConfig] })],
+      useFactory: (
+        configMail: ConfigType<typeof mailConfig>,
+      ): MailerOptions => ({
+        transport: {
+          host: configMail.host,
+          port: configMail.port,
+          auth: {
+            user: configMail.auth.user,
+            pass: configMail.auth.password,
+          },
+        },
+      }),
+      inject: [mailConfig.KEY],
+    }),
+    BullModule.registerQueue({
+      name: 'mailerQueue',
+    }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule.forRoot({ load: [redisConfig] })],
+      useFactory: (configRedis: ConfigType<typeof redisConfig>) => ({
+        redis: {
+          port: configRedis.port,
+          host: configRedis.host,
+        },
+      }),
+      inject: [redisConfig.KEY],
+    }),
+  ],
+  controllers: [AppController],
+  providers: [AppService, MailerQueue],
+})
+export class AppModule {}

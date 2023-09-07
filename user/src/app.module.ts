@@ -6,7 +6,7 @@ import redisConfig from './config/redis.config';
 import { ConfigModule, ConfigService, ConfigType } from '@nestjs/config';
 import { BullModule } from '@nestjs/bull';
 import { provideUsersRepository } from './repositories/user.repository.provider';
-import { UserProducerService } from './jobs/user-producer.service';
+import { AuthProducerService } from './jobs/auth-producer.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { LocalStrategy } from './strategies/local.strategy';
 
@@ -41,9 +41,9 @@ import { LocalStrategy } from './strategies/local.strategy';
     UsersService,
     PrismaService,
     ...provideUsersRepository(),
-    UserProducerService,
+    AuthProducerService,
     LocalStrategy,
   ],
-  exports: [UserProducerService],
+  exports: [AuthProducerService],
 })
 export class AppModule {}

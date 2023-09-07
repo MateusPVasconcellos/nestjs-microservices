@@ -16,7 +16,7 @@ services:
     image: "redis:alpine"
     ports:
       - "6379:6379"
-    container_name: store-redis
+    container_name: redis
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
 

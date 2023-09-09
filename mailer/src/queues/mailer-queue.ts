@@ -18,7 +18,6 @@ class MailerQueue {
   @Process('mailerQueue.sendActivateEmail')
   async sendActivateEmail(job: Job<ActivateEmailEvent>) {
     const { data } = job;
-    console.log('oi', data);
     await this.mailService.sendMail({
       to: data.email,
       from: 'Team G',

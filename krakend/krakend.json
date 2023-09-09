@@ -68,14 +68,19 @@
 		{
 			"@comment": "Refresh",
 			"endpoint": "/refresh",
-			"input_headers": ["*"],
+			"input_headers": ["x-email", "x-user", "x-jti"],
 			"method": "GET",
 			"extra_config": {
 				"auth/validator": {
 					"alg": "HS256",
 					"jwk_local_path": "./jwk.txt",
 					"operation_debug": true,
-					"disable_jwk_security": true
+					"disable_jwk_security": true,
+					"propagate_claims": [
+						["sub", "x-user"],
+						["jti", "x-jti"],
+						["email", "x-email"]
+					]
 				}
 			},
 			"backend": [
@@ -83,6 +88,29 @@
 					"host": ["http://192.168.1.2:8000"],
 					"method": "GET",
 					"url_pattern": "/refresh",
+					"encoding": "safejson"
+				}
+			]
+		},
+		{
+			"@comment": "Activate User",
+			"endpoint": "/activate",
+			"input_headers": ["x-email"],
+			"method": "GET",
+			"extra_config": {
+				"auth/validator": {
+					"alg": "HS256",
+					"jwk_local_path": "./jwk.txt",
+					"operation_debug": true,
+					"disable_jwk_security": true,
+					"propagate_claims": [["email", "x-email"]]
+				}
+			},
+			"backend": [
+				{
+					"host": ["http://192.168.1.2:8010"],
+					"method": "GET",
+					"url_pattern": "/activate",
 					"encoding": "safejson"
 				}
 			]

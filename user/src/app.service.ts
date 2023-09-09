@@ -17,6 +17,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
 import { validate } from 'class-validator';
 import * as bcrypt from 'bcrypt';
+import { Request } from 'express';
 
 @Injectable()
 export class UsersService {
@@ -44,6 +45,18 @@ export class UsersService {
     );
 
     return tokens;
+  }
+
+  async activate(req: Request) {
+    const email = req.get('x-email');
+    const user = await this.usersRepository.findOne({ where: { email } });
+    if (user.active) throw new UnauthorizedException();
+
+    const params = {
+      where: { email },
+      data: { active: true },
+    };
+    return this.usersRepository.update(params);
   }
 
   async createUser(createUserDto) {

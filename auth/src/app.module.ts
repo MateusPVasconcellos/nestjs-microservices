@@ -4,14 +4,12 @@ import { AppService } from './app.service';
 import { PrismaService } from './database/prisma.service';
 import { ConfigModule, ConfigService, ConfigType } from '@nestjs/config';
 import { BullModule } from '@nestjs/bull';
-import mailConfig from './config/mail.config';
 import { JwtService } from './services/jwt.service';
 import { JwtModule } from '@nestjs/jwt';
 import jwtConfig from './config/jwt.config';
 import redisConfig from './config/redis.config';
 import { provideAuthRepository } from './repositories/auth.repository.provider';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { AuthQueue } from './queues/auth-queue';
 import { MailerProducerService } from './jobs/mailer-producer.service';
 
@@ -50,7 +48,6 @@ import { MailerProducerService } from './jobs/mailer-producer.service';
   providers: [
     AppService,
     PrismaService,
-    JwtRefreshStrategy,
     JwtService,
     AuthQueue,
     MailerProducerService,

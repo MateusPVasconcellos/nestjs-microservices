@@ -4,7 +4,7 @@ import {
   AuthRepository,
 } from './repositories/auth.repository.interface';
 import { JwtService } from './services/jwt.service';
-import { User } from './models/refresh-request.model';
+import { Request } from 'express';
 
 @Injectable()
 export class AppService {
@@ -14,31 +14,31 @@ export class AppService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async refresh(user: User) {
-    const tokens = await this.jwtService.generateTokens(user.id, user.email);
+  async refresh(request: Request) {
+    const user = request.get('x-user');
+    const jti = request.get('x-jti');
+    const email = request.get('x-email');
+
+    const { jti_refresh_token } = await this.authRepository.findOne({
+      where: { user_id: user },
+    });
+
+    if (jti_refresh_token) {
+      if (jti_refresh_token !== jti) throw new UnauthorizedException();
+    }
+
+    const tokens = await this.jwtService.generateTokens(user, email);
     await this.authRepository.update({
       data: {
         jti_refresh_token: tokens.jti,
       },
       where: {
-        user_id: user.id,
+        user_id: user,
       },
     });
     //this.loggerService.info(`USER REFRESH: ${JSON.stringify(user)}`);
     tokens.jti = undefined;
     return tokens;
-  }
-
-  async validateRefreshToken(token: string, user_id: string) {
-    const { jti_refresh_token } = await this.authRepository.findOne({
-      where: { user_id: user_id },
-    });
-
-    if (jti_refresh_token) {
-      const decodedToken = this.jwtService.decodeToken(token);
-      if (jti_refresh_token !== decodedToken.jti)
-        throw new UnauthorizedException();
-    }
   }
 
   async generateTokens(user_id: string, email: string) {

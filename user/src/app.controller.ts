@@ -1,8 +1,16 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { UsersService } from './app.service';
 import { CreateUserDto } from './shared/dtos/create-user.dto';
 import { SigninDto } from './shared/dtos/signin.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { Request as RequestExpress } from 'express';
 
 @Controller()
 export class UsersController {
@@ -22,5 +30,10 @@ export class UsersController {
   @Get('users')
   findAll() {
     return this.appService.findAll();
+  }
+
+  @Get('activate')
+  activate(@Request() req: RequestExpress) {
+    return this.appService.activate(req);
   }
 }

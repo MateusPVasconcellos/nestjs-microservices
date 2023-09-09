@@ -28,7 +28,6 @@ class AuthQueue {
     await this.mailerProducer.sendActivateEmail(
       new ActivateEmailEvent(data.email, data.name, token),
     );
-    console.log('authque');
   }
 
   @Process('authQueue.sendRecoveryEmail')

@@ -69,10 +69,16 @@ export class JwtService {
       email: email,
     };
 
+    const tokenHeader = {
+      kid: 'activate',
+      alg: 'HS256',
+    };
+
     const activateToken = this.jwtNest.sign(tokenPayload, {
       privateKey: this.configService.get('jwt.activatePrivateKey'),
       expiresIn: this.configService.get('jwt.activateExpiresIn'),
       algorithm: 'HS256',
+      header: tokenHeader,
     });
 
     return activateToken;

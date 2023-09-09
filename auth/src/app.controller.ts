@@ -1,8 +1,7 @@
-import { Controller, Get, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, Request } from '@nestjs/common';
 import { AppService } from './app.service';
 import { MessagePattern } from '@nestjs/microservices';
-import { JwtRefreshAuthGuard } from './guards/jwt-refresh-auth.guard';
-import { RefreshRequest } from './models/refresh-request.model';
+import { Request as RequestExpress } from 'express';
 
 @Controller()
 export class AppController {
@@ -18,9 +17,8 @@ export class AppController {
     return this.appService.generateActivateToken(data.email);
   }
 
-  @UseGuards(JwtRefreshAuthGuard)
   @Get('refresh')
-  refresh(@Request() req: RefreshRequest) {
-    return this.appService.refresh(req.user);
+  refresh(@Request() req: RequestExpress) {
+    return this.appService.refresh(req);
   }
 }

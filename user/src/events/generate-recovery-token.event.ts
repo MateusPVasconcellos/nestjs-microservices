@@ -1,7 +1,7 @@
-export class RecoveryEmailEvent {
+export class GenerateRecoveryTokenEvent {
   constructor(
     readonly email?: string,
     readonly name?: string,
-    readonly token?: string,
+    readonly hash?: string,
   ) {}
 }

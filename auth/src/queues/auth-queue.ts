@@ -1,6 +1,7 @@
 import { OnQueueFailed, Process, Processor } from '@nestjs/bull';
 import { HttpException } from '@nestjs/common';
 import { Job } from 'bull';
+import { GenerateRecoveryTokenEvent } from 'src/events/generate-recovery-token.event';
 import { ActivateEmailEvent } from 'src/events/send-activate-email.event';
 import { RecoveryEmailEvent } from 'src/events/send-recovery-email.event';
 import { UserCreatedEvent } from 'src/events/user-created.event';
@@ -40,9 +41,14 @@ class AuthQueue {
     );
   }
 
-  @Process('authQueue.sendRecoveryEmail')
-  async sendRecoveryEmailJob(job: Job<RecoveryEmailEvent>) {
+  @Process('authQueue.generateRecoveryToken')
+  async generateRecoveryToken(job: Job<GenerateRecoveryTokenEvent>) {
     const { data } = job;
+    const token = this.jwtService.generateRecoveryToken(data.hash, data.email);
+
+    await this.mailerProducer.sendRecoveryEmail(
+      new RecoveryEmailEvent(data.email, data.name, token),
+    );
   }
 }
 

@@ -19,6 +19,7 @@ import { validate } from 'class-validator';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
 import { ResendActivateEmailEvent } from './events/resend-activate-email.event';
+import { GenerateRecoveryTokenEvent } from './events/generate-recovery-token.event';
 
 @Injectable()
 export class UsersService {
@@ -58,6 +59,25 @@ export class UsersService {
     if (user.active) throw new BadRequestException('User is already active');
     await this.authProducer.resendActivateEmail(
       new UserCreatedEvent(user.userDetail.name, email),
+    );
+  }
+
+  async sendRecoveryEmail(email: string) {
+    const user = await this.usersRepository.findOne({
+      where: { email: email },
+      include: {
+        userDetail: true,
+      },
+    });
+
+    if (!user) throw new BadRequestException();
+
+    await this.authProducer.generateRecoveryToken(
+      new GenerateRecoveryTokenEvent(
+        email,
+        user.userDetail.name,
+        user.password,
+      ),
     );
   }
 

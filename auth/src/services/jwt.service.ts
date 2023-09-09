@@ -90,9 +90,14 @@ export class JwtService {
     const tokenPayload = {
       email: email,
     };
+    const tokenHeader = {
+      kid: 'recovery',
+      alg: 'HS256',
+    };
     const recoveryToken = this.jwtNest.sign(tokenPayload, {
       secret: hash,
       expiresIn: this.configService.get('jwt.recoveryExpiresIn'),
+      header: tokenHeader,
     });
 
     return recoveryToken;

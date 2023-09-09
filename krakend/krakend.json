@@ -128,6 +128,20 @@
 					"encoding": "string"
 				}
 			]
+		},
+		{
+			"@comment": "Send Recovery Password Email",
+			"endpoint": "/recovery-email",
+			"method": "GET",
+			"input_query_strings": ["email"],
+			"backend": [
+				{
+					"host": ["http://192.168.1.2:8010"],
+					"method": "GET",
+					"url_pattern": "/recovery-email",
+					"encoding": "string"
+				}
+			]
 		}
 	],
 	"extra_config": {

@@ -42,4 +42,9 @@ export class UsersController {
   resendActivate(@Query('email') email: string) {
     return this.appService.resendActivate(email);
   }
+
+  @Get('recovery-email')
+  SendRecoveryEmail(@Query('email') email: string) {
+    return this.appService.sendRecoveryEmail(email);
+  }
 }

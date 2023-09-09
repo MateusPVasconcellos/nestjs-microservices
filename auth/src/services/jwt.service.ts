@@ -2,6 +2,8 @@ import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common/decorators/core/injectable.decorator';
 import { v4 as uuidv4 } from 'uuid';
 import { JwtService as JwtNest } from '@nestjs/jwt';
+import { UserPayload } from 'src/models/user-payload.model';
+import { UserToken } from 'src/models/user-token.model';
 
 @Injectable()
 export class JwtService {
@@ -95,18 +97,4 @@ export class JwtService {
 
     return recoveryToken;
   }
-}
-
-export class UserToken {
-  access_token: string;
-  refresh_token: string;
-  jti: string;
-}
-
-export class UserPayload {
-  sub?: string;
-  email?: string;
-  iat?: number;
-  exp?: number;
-  jti?: string;
 }

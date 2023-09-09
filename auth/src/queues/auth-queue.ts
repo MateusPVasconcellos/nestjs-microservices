@@ -30,6 +30,16 @@ class AuthQueue {
     );
   }
 
+  @Process('authQueue.resendActivateEmail')
+  async regenerateActivateToken(job: Job<UserCreatedEvent>) {
+    const { data } = job;
+    const token = this.jwtService.generateActivateToken(data.email);
+
+    await this.mailerProducer.sendActivateEmail(
+      new ActivateEmailEvent(data.email, data.name, token),
+    );
+  }
+
   @Process('authQueue.sendRecoveryEmail')
   async sendRecoveryEmailJob(job: Job<RecoveryEmailEvent>) {
     const { data } = job;

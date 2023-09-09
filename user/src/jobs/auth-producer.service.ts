@@ -7,8 +7,12 @@ import { UserCreatedEvent } from 'src/events/user-created.event';
 class AuthProducerService {
   constructor(@InjectQueue('authQueue') private authQueue: Queue) {}
 
-  async userCreated(userCreatedEvent: UserCreatedEvent) {
-    await this.authQueue.add('authQueue.userCreated', userCreatedEvent);
+  async userCreated(event: UserCreatedEvent) {
+    await this.authQueue.add('authQueue.userCreated', event);
+  }
+
+  async resendActivateEmail(event: UserCreatedEvent) {
+    await this.authQueue.add('authQueue.resendActivateEmail', event);
   }
 }
 

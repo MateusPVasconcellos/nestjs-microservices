@@ -5,6 +5,7 @@ import {
   Post,
   UseGuards,
   Request,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './app.service';
 import { CreateUserDto } from './shared/dtos/create-user.dto';
@@ -35,5 +36,10 @@ export class UsersController {
   @Get('activate')
   activate(@Request() req: RequestExpress) {
     return this.appService.activate(req);
+  }
+
+  @Get('resend-activate')
+  resendActivate(@Query('email') email: string) {
+    return this.appService.resendActivate(email);
   }
 }

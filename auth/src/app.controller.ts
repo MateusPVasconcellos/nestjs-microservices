@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Request } from '@nestjs/common';
+import { Controller, Get, Request } from '@nestjs/common';
 import { AppService } from './app.service';
 import { MessagePattern } from '@nestjs/microservices';
 import { Request as RequestExpress } from 'express';

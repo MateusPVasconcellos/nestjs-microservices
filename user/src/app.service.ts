@@ -18,6 +18,7 @@ import { lastValueFrom } from 'rxjs';
 import { validate } from 'class-validator';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
+import { ResendActivateEmailEvent } from './events/resend-activate-email.event';
 
 @Injectable()
 export class UsersService {
@@ -45,6 +46,19 @@ export class UsersService {
     );
 
     return tokens;
+  }
+
+  async resendActivate(email: string) {
+    const user = await this.usersRepository.findOne({
+      where: { email: email },
+      include: {
+        userDetail: true,
+      },
+    });
+    if (user.active) throw new BadRequestException('User is already active');
+    await this.authProducer.resendActivateEmail(
+      new UserCreatedEvent(user.userDetail.name, email),
+    );
   }
 
   async activate(req: Request) {

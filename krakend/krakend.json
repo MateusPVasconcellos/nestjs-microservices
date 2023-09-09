@@ -114,6 +114,20 @@
 					"encoding": "safejson"
 				}
 			]
+		},
+		{
+			"@comment": "Resend Activate User Email",
+			"endpoint": "/resend-activate",
+			"method": "GET",
+			"input_query_strings": ["email"],
+			"backend": [
+				{
+					"host": ["http://192.168.1.2:8010"],
+					"method": "GET",
+					"url_pattern": "/resend-activate",
+					"encoding": "string"
+				}
+			]
 		}
 	],
 	"extra_config": {

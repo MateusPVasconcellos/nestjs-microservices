@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { UserRefreshToken } from '../../entities/user-refresh-token.entity';
-import { AuthRepository } from '../auth.repository.interface';
-import { Prisma } from '@prisma/client';
 
-export class AuthInMemoryRepository implements AuthRepository {
+import { Prisma } from '@prisma/client';
+import { RefreshRepository } from '../interfaces/refresh.repository.interface';
+
+export class RefreshInMemoryRepository implements RefreshRepository {
   update(params: {
     where: Prisma.UserRefreshTokenWhereUniqueInput;
     data: Prisma.UserRefreshTokenUpdateInput;

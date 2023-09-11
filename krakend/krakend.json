@@ -111,7 +111,12 @@
 					"host": ["http://192.168.1.7:8010"],
 					"method": "GET",
 					"url_pattern": "/activate",
-					"encoding": "safejson"
+					"encoding": "safejson",
+					"extra_config": {
+						"proxy": {
+							"flatmap_filter": [{ "type": "del", "args": ["password"] }]
+						}
+					}
 				}
 			]
 		},

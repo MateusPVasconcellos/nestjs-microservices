@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
-import { UserRefreshToken } from '../entities/user-refresh-token.entity';
+import { UserRefreshToken } from 'src/entities/user-refresh-token.entity';
 
-export interface AuthRepository {
+export interface RefreshRepository {
   update(params: {
     where: Prisma.UserRefreshTokenWhereUniqueInput;
     data: Prisma.UserRefreshTokenUpdateInput;
@@ -13,4 +13,4 @@ export interface AuthRepository {
   }): Promise<UserRefreshToken>;
 }
 
-export const AUTH_REPOSITORY_TOKEN = 'auth-repository-token';
+export const REFRESH_REPOSITORY_TOKEN = 'refresh-repository-token';

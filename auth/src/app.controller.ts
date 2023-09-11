@@ -21,4 +21,9 @@ export class AppController {
   refresh(@Request() req: RequestExpress) {
     return this.appService.refresh(req);
   }
+
+  @MessagePattern({ cmd: 'validate-recovery-token' })
+  validateRecoveryToken(data: any) {
+    return this.appService.recovery(data);
+  }
 }

@@ -1,9 +1,9 @@
 import { UserRefreshToken } from '../../entities/user-refresh-token.entity';
 import { PrismaService } from 'src/database/prisma.service';
-import { AuthRepository } from '../auth.repository.interface';
 import { Prisma } from '@prisma/client';
+import { RefreshRepository } from '../interfaces/refresh.repository.interface';
 
-export class AuthPrismaRepository implements AuthRepository {
+export class RefreshPrismaRepository implements RefreshRepository {
   constructor(private prisma: PrismaService) {}
   update(params: {
     where: Prisma.UserRefreshTokenWhereUniqueInput;

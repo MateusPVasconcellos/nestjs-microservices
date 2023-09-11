@@ -17,3 +17,14 @@ model UserRefreshToken {
   @@index([user_id])
   @@map("UserRefreshToken")
 }
+
+model UserRecoveryToken {
+  id                 String   @id @default(cuid())
+  jti_recovery_token String
+  user_id            String   @unique
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+
+  @@index([user_id])
+  @@map("UserRecoveryToken")
+}

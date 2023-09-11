@@ -44,7 +44,7 @@ class AuthQueue {
   @Process('authQueue.generateRecoveryToken')
   async generateRecoveryToken(job: Job<GenerateRecoveryTokenEvent>) {
     const { data } = job;
-    const token = this.jwtService.generateRecoveryToken(data.hash, data.email);
+    const token = this.jwtService.generateRecoveryToken(data.email);
 
     await this.mailerProducer.sendRecoveryEmail(
       new RecoveryEmailEvent(data.email, data.name, token),

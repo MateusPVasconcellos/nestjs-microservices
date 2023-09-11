@@ -18,7 +18,6 @@ import { lastValueFrom } from 'rxjs';
 import { validate } from 'class-validator';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
-import { ResendActivateEmailEvent } from './events/resend-activate-email.event';
 import { GenerateRecoveryTokenEvent } from './events/generate-recovery-token.event';
 
 @Injectable()
@@ -73,11 +72,7 @@ export class UsersService {
     if (!user) throw new BadRequestException();
 
     await this.authProducer.generateRecoveryToken(
-      new GenerateRecoveryTokenEvent(
-        email,
-        user.userDetail.name,
-        user.password,
-      ),
+      new GenerateRecoveryTokenEvent(email, user.userDetail.name),
     );
   }
 

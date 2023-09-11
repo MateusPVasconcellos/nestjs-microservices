@@ -31,7 +31,6 @@ class MailerQueue {
   @Process('mailerQueue.sendRecoveryEmail')
   async sendRecoveryEmailJob(job: Job<RecoveryEmailEvent>) {
     const { data } = job;
-    console.log(data);
     await this.mailService.sendMail({
       to: data.email,
       from: 'Team G',

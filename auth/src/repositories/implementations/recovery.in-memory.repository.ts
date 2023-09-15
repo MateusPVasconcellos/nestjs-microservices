@@ -1,8 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Prisma, UserRecoveryToken } from '@prisma/client';
 import { RecoveryRepository } from '../interfaces/Recovery.repository.interface';
+import { DefaultArgs } from '@prisma/client/runtime/library';
 
 export class RecoveryInMemoryRepository implements RecoveryRepository {
+  upsert(params: Prisma.UserRecoveryTokenUpsertArgs<DefaultArgs>) {
+    throw new Error('Method not implemented.');
+  }
   update(params: {
     where: Prisma.UserRecoveryTokenWhereUniqueInput;
     data: Prisma.UserRecoveryTokenUpdateInput;

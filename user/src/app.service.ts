@@ -19,6 +19,7 @@ import { validate } from 'class-validator';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
 import { GenerateRecoveryTokenEvent } from './events/generate-recovery-token.event';
+import { RecoveryPasswordDto } from './shared/dtos/recovery-password.dto';
 
 @Injectable()
 export class UsersService {
@@ -48,6 +49,28 @@ export class UsersService {
     return tokens;
   }
 
+  async recovery(req: Request, recoveryPasswordDto: RecoveryPasswordDto) {
+    const jti = req.get('x-jti');
+    const user_id = req.get('x-user');
+
+    const isTokenValid = await lastValueFrom(
+      this.authClient.send(
+        { cmd: 'validate-recovery-token' },
+        { user_id, jti },
+      ),
+    );
+
+    if (!isTokenValid) {
+      throw new UnauthorizedException();
+    }
+    const hashedPassword = await bcrypt.hash(recoveryPasswordDto.password, 8);
+
+    return await this.usersRepository.update({
+      where: { id: user_id },
+      data: { password: hashedPassword },
+    });
+  }
+
   async resendActivate(email: string) {
     const user = await this.usersRepository.findOne({
       where: { email: email },
@@ -72,7 +95,7 @@ export class UsersService {
     if (!user) throw new BadRequestException();
 
     await this.authProducer.generateRecoveryToken(
-      new GenerateRecoveryTokenEvent(email, user.userDetail.name),
+      new GenerateRecoveryTokenEvent(email, user.userDetail.name, user.id),
     );
   }
 

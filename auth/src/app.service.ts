@@ -5,12 +5,18 @@ import {
 } from './repositories/interfaces/refresh.repository.interface';
 import { JwtService } from './services/jwt.service';
 import { Request } from 'express';
+import {
+  RECOVERY_REPOSITORY_TOKEN,
+  RecoveryRepository,
+} from './repositories/interfaces/recovery.repository.interface';
 
 @Injectable()
 export class AppService {
   constructor(
     @Inject(REFRESH_REPOSITORY_TOKEN)
     private readonly refreshRepository: RefreshRepository,
+    @Inject(RECOVERY_REPOSITORY_TOKEN)
+    private readonly recoveryRepository: RecoveryRepository,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -41,27 +47,20 @@ export class AppService {
   }
 
   async recovery(data: any) {
-    const { jti_refresh_token } = await this.refreshRepository.findOne({
+    const { jti_recovery_token } = await this.recoveryRepository.findOne({
       where: { user_id: data.user_id },
     });
 
-    if (jti_refresh_token !== data.jti) throw new UnauthorizedException();
+    if (jti_recovery_token !== data.jti) return false;
 
-    const tokens = await this.jwtService.generateTokens(
-      data.user_id,
-      data.email,
-    );
-    await this.refreshRepository.update({
-      data: {
-        jti_refresh_token: tokens.jti,
-      },
+    await this.recoveryRepository.delete({
       where: {
-        user_id: data.user,
+        user_id: data.user_id,
       },
     });
+
+    return true;
     //this.loggerService.info(`USER REFRESH: ${JSON.stringify(user)}`);
-    tokens.jti = undefined;
-    return tokens;
   }
 
   async generateTokens(user_id: string, email: string) {

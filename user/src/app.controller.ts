@@ -12,6 +12,7 @@ import { CreateUserDto } from './shared/dtos/create-user.dto';
 import { SigninDto } from './shared/dtos/signin.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { Request as RequestExpress } from 'express';
+import { RecoveryPasswordDto } from './shared/dtos/recovery-password.dto';
 
 @Controller()
 export class UsersController {
@@ -46,5 +47,13 @@ export class UsersController {
   @Get('recovery-email')
   SendRecoveryEmail(@Query('email') email: string) {
     return this.appService.sendRecoveryEmail(email);
+  }
+
+  @Post('recovery')
+  recovery(
+    @Request() req: RequestExpress,
+    @Body() recoveryPasswordDto: RecoveryPasswordDto,
+  ) {
+    return this.appService.recovery(req, recoveryPasswordDto);
   }
 }

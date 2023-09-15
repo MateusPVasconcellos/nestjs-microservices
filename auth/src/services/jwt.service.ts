@@ -86,10 +86,11 @@ export class JwtService {
     return activateToken;
   }
 
-  generateRecoveryToken(email: string) {
+  generateRecoveryToken(email: string, user_id: string) {
     const jwtJti = uuidv4();
     const tokenPayload = {
-      email: email,
+      sub: user_id,
+      email,
       jti: jwtJti,
     };
     const tokenHeader = {
@@ -97,11 +98,11 @@ export class JwtService {
       alg: 'HS256',
     };
     const recoveryToken = this.jwtNest.sign(tokenPayload, {
-      secret: this.configService.get('jwt.recoveryPrivateKey'),
+      privateKey: this.configService.get('jwt.recoveryPrivateKey'),
       expiresIn: this.configService.get('jwt.recoveryExpiresIn'),
       header: tokenHeader,
     });
 
-    return recoveryToken;
+    return { recoveryToken, jwtJti };
   }
 }

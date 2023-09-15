@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { DataSource } from 'src/shared/enums/dataSource.enum';
 import { PrismaService } from 'src/database/prisma.service';
 import { RECOVERY_REPOSITORY_TOKEN } from './recovery.repository.interface';
-import { RecoveryPrismaRepository } from '../implementations/recovery.prisma.repository copy';
+import { RecoveryPrismaRepository } from '../implementations/recovery.prisma.repository';
 import { RecoveryInMemoryRepository } from '../implementations/recovery.in-memory.repository';
 
 export function provideRecoveryRepository(): Provider[] {

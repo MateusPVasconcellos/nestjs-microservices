@@ -6,6 +6,17 @@ export interface RecoveryRepository {
     where: Prisma.UserRecoveryTokenWhereUniqueInput;
     data: Prisma.UserRecoveryTokenUpdateInput;
   });
+  upsert(params: {
+    where: Prisma.UserRecoveryTokenWhereUniqueInput;
+    create: Prisma.XOR<
+      Prisma.UserRecoveryTokenCreateInput,
+      Prisma.UserRecoveryTokenUncheckedCreateInput
+    >;
+    update: Prisma.XOR<
+      Prisma.UserRecoveryTokenUpdateInput,
+      Prisma.UserRecoveryTokenUncheckedUpdateInput
+    >;
+  });
   create(params: { data: Prisma.UserRecoveryTokenCreateInput });
   delete(params: { where: Prisma.UserRecoveryTokenWhereUniqueInput });
   findOne(params: {
@@ -13,4 +24,4 @@ export interface RecoveryRepository {
   }): Promise<UserRecoveryToken>;
 }
 
-export const RECOVERY_REPOSITORY_TOKEN = 'Recovery-repository-token';
+export const RECOVERY_REPOSITORY_TOKEN = 'recovery-repository-token';

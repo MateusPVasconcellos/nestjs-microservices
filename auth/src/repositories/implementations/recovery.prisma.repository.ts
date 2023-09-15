@@ -14,6 +14,10 @@ export class RecoveryPrismaRepository implements RecoveryRepository {
     });
   }
 
+  upsert(params: Prisma.UserRecoveryTokenUpsertArgs) {
+    return this.prisma.userRecoveryToken.upsert(params);
+  }
+
   findOne(params: {
     where: Prisma.UserRecoveryTokenWhereUniqueInput;
   }): Promise<UserRecoveryToken> {

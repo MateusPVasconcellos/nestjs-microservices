@@ -147,6 +147,37 @@
 					"encoding": "string"
 				}
 			]
+		},
+		{
+			"@comment": "Recovery Password",
+			"endpoint": "/recovery",
+			"input_headers": ["*"],
+			"method": "POST",
+			"extra_config": {
+				"auth/validator": {
+					"alg": "HS256",
+					"jwk_local_path": "./jwk.txt",
+					"operation_debug": true,
+					"disable_jwk_security": true,
+					"propagate_claims": [
+						["sub", "x-user"],
+						["jti", "x-jti"]
+					]
+				}
+			},
+			"backend": [
+				{
+					"host": ["http://192.168.1.7:8010"],
+					"method": "POST",
+					"url_pattern": "/recovery",
+					"encoding": "safejson",
+					"extra_config": {
+						"proxy": {
+							"flatmap_filter": [{ "type": "del", "args": ["password"] }]
+						}
+					}
+				}
+			]
 		}
 	],
 	"extra_config": {

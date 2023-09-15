@@ -4,9 +4,34 @@ import { RecoveryRepository } from '../interfaces/Recovery.repository.interface'
 import { DefaultArgs } from '@prisma/client/runtime/library';
 
 export class RecoveryInMemoryRepository implements RecoveryRepository {
-  upsert(params: Prisma.UserRecoveryTokenUpsertArgs<DefaultArgs>) {
+  upsert(params: {
+    where: Prisma.UserRecoveryTokenWhereUniqueInput;
+    create:
+      | (Prisma.Without<
+          Prisma.UserRecoveryTokenCreateInput,
+          Prisma.UserRecoveryTokenUncheckedCreateInput
+        > &
+          Prisma.UserRecoveryTokenUncheckedCreateInput)
+      | (Prisma.Without<
+          Prisma.UserRecoveryTokenUncheckedCreateInput,
+          Prisma.UserRecoveryTokenCreateInput
+        > &
+          Prisma.UserRecoveryTokenCreateInput);
+    update:
+      | (Prisma.Without<
+          Prisma.UserRecoveryTokenUpdateInput,
+          Prisma.UserRecoveryTokenUncheckedUpdateInput
+        > &
+          Prisma.UserRecoveryTokenUncheckedUpdateInput)
+      | (Prisma.Without<
+          Prisma.UserRecoveryTokenUncheckedUpdateInput,
+          Prisma.UserRecoveryTokenUpdateInput
+        > &
+          Prisma.UserRecoveryTokenUpdateInput);
+  }) {
     throw new Error('Method not implemented.');
   }
+
   update(params: {
     where: Prisma.UserRecoveryTokenWhereUniqueInput;
     data: Prisma.UserRecoveryTokenUpdateInput;

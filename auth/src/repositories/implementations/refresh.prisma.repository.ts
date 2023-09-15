@@ -14,6 +14,9 @@ export class RefreshPrismaRepository implements RefreshRepository {
       data: params.data,
     });
   }
+  upsert(params: Prisma.UserRefreshTokenUpsertArgs) {
+    return this.prisma.userRefreshToken.upsert(params);
+  }
 
   findOne(params: {
     where: Prisma.UserRefreshTokenWhereUniqueInput;

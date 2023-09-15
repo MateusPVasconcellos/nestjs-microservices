@@ -1,6 +1,7 @@
 import { OnQueueFailed, Process, Processor } from '@nestjs/bull';
 import { HttpException, Inject } from '@nestjs/common';
 import { Job } from 'bull';
+import { AppService } from 'src/app.service';
 import { GenerateRecoveryTokenEvent } from 'src/events/generate-recovery-token.event';
 import { ActivateEmailEvent } from 'src/events/send-activate-email.event';
 import { RecoveryEmailEvent } from 'src/events/send-recovery-email.event';
@@ -10,15 +11,14 @@ import {
   RECOVERY_REPOSITORY_TOKEN,
   RecoveryRepository,
 } from 'src/repositories/interfaces/recovery.repository.interface';
-import { JwtService } from 'src/services/jwt.service';
 
 @Processor('authQueue')
 class AuthQueue {
   constructor(
-    private readonly jwtService: JwtService,
     private readonly mailerProducer: MailerProducerService,
     @Inject(RECOVERY_REPOSITORY_TOKEN)
     private readonly recoveryRepository: RecoveryRepository,
+    private readonly appService: AppService,
   ) {}
 
   @OnQueueFailed()
@@ -30,7 +30,7 @@ class AuthQueue {
   @Process('authQueue.userCreated')
   async generateActivateToken(job: Job<UserCreatedEvent>) {
     const { data } = job;
-    const token = this.jwtService.generateActivateToken(data.email);
+    const token = this.appService.generateActivateToken(data.email);
 
     await this.mailerProducer.sendActivateEmail(
       new ActivateEmailEvent(data.email, data.name, token),
@@ -40,7 +40,7 @@ class AuthQueue {
   @Process('authQueue.resendActivateEmail')
   async regenerateActivateToken(job: Job<UserCreatedEvent>) {
     const { data } = job;
-    const token = this.jwtService.generateActivateToken(data.email);
+    const token = this.appService.generateActivateToken(data.email);
 
     await this.mailerProducer.sendActivateEmail(
       new ActivateEmailEvent(data.email, data.name, token),
@@ -50,7 +50,7 @@ class AuthQueue {
   @Process('authQueue.generateRecoveryToken')
   async generateRecoveryToken(job: Job<GenerateRecoveryTokenEvent>) {
     const { data } = job;
-    const token = this.jwtService.generateRecoveryToken(
+    const token = this.appService.generateRecoveryToken(
       data.email,
       data.user_id,
     );

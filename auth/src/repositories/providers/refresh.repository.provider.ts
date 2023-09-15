@@ -2,7 +2,7 @@ import { Injectable, Provider } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { DataSource } from 'src/shared/enums/dataSource.enum';
 import { PrismaService } from 'src/database/prisma.service';
-import { REFRESH_REPOSITORY_TOKEN } from './refresh.repository.interface';
+import { REFRESH_REPOSITORY_TOKEN } from '../interfaces/refresh.repository.interface';
 import { RefreshPrismaRepository } from '../implementations/refresh.prisma.repository';
 import { RefreshInMemoryRepository } from '../implementations/refresh.in-memory.repository';
 

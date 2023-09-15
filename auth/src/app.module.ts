@@ -4,15 +4,14 @@ import { AppService } from './app.service';
 import { PrismaService } from './database/prisma.service';
 import { ConfigModule, ConfigService, ConfigType } from '@nestjs/config';
 import { BullModule } from '@nestjs/bull';
-import { JwtService } from './services/jwt.service';
 import { JwtModule } from '@nestjs/jwt';
 import jwtConfig from './config/jwt.config';
 import redisConfig from './config/redis.config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AuthQueue } from './queues/auth-queue';
 import { MailerProducerService } from './jobs/mailer-producer.service';
-import { provideRefreshRepository } from './repositories/interfaces/refresh.repository.provider';
-import { provideRecoveryRepository } from './repositories/interfaces/recovery.repository.provider';
+import { provideRefreshRepository } from './repositories/providers/refresh.repository.provider';
+import { provideRecoveryRepository } from './repositories/providers/recovery.repository.provider';
 
 @Module({
   imports: [
@@ -49,7 +48,6 @@ import { provideRecoveryRepository } from './repositories/interfaces/recovery.re
   providers: [
     AppService,
     PrismaService,
-    JwtService,
     AuthQueue,
     MailerProducerService,
     ...provideRefreshRepository(),

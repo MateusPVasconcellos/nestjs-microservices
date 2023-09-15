@@ -3,12 +3,15 @@ import {
   REFRESH_REPOSITORY_TOKEN,
   RefreshRepository,
 } from './repositories/interfaces/refresh.repository.interface';
-import { JwtService } from './services/jwt.service';
 import { Request } from 'express';
 import {
   RECOVERY_REPOSITORY_TOKEN,
   RecoveryRepository,
 } from './repositories/interfaces/recovery.repository.interface';
+import { JwtService } from '@nestjs/jwt';
+import { UserPayload } from './models/user-payload.model';
+import { v4 as uuidv4 } from 'uuid';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AppService {
@@ -17,33 +20,69 @@ export class AppService {
     private readonly refreshRepository: RefreshRepository,
     @Inject(RECOVERY_REPOSITORY_TOKEN)
     private readonly recoveryRepository: RecoveryRepository,
-    private readonly jwtService: JwtService,
+    private readonly jwt: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   async refresh(request: Request) {
-    const user = request.get('x-user');
+    const user_id = request.get('x-user');
     const jti = request.get('x-jti');
     const email = request.get('x-email');
     const { jti_refresh_token } = await this.refreshRepository.findOne({
-      where: { user_id: user },
+      where: { user_id },
     });
 
     if (jti_refresh_token) {
       if (jti_refresh_token !== jti) throw new UnauthorizedException();
     }
 
-    const tokens = await this.jwtService.generateTokens(user, email);
-    await this.refreshRepository.update({
-      data: {
-        jti_refresh_token: tokens.jti,
-      },
-      where: {
-        user_id: user,
-      },
+    const jwtJti = uuidv4();
+
+    const tokenPayload: UserPayload = {
+      sub: user_id,
+      email,
+    };
+
+    const refreshTokenPayload: UserPayload = {
+      sub: user_id,
+      email,
+      jti: jwtJti,
+    };
+
+    const accessTokenHeader = {
+      kid: 'access',
+      alg: 'HS256',
+    };
+
+    const refreshTokenHeader = {
+      kid: 'refresh',
+      alg: 'HS256',
+    };
+
+    const [access_token, refresh_token] = [
+      this.jwt.sign(tokenPayload, {
+        privateKey: this.configService.get('jwt.accessPrivateKey'),
+        expiresIn: this.configService.get('jwt.accessExpiresIn'),
+        algorithm: 'HS256',
+        header: accessTokenHeader,
+      }),
+      this.jwt.sign(refreshTokenPayload, {
+        privateKey: this.configService.get('jwt.refreshPrivateKey'),
+        expiresIn: this.configService.get('jwt.refreshExpiresIn'),
+        algorithm: 'HS256',
+        header: refreshTokenHeader,
+      }),
+    ];
+    await this.refreshRepository.upsert({
+      where: { user_id: user_id },
+      create: { user_id: user_id, jti_refresh_token: jwtJti },
+      update: { jti_refresh_token: jwtJti },
     });
     //this.loggerService.info(`USER REFRESH: ${JSON.stringify(user)}`);
-    tokens.jti = undefined;
-    return tokens;
+    return {
+      access_token,
+      refresh_token,
+    };
   }
 
   async recovery(data: any) {
@@ -63,42 +102,91 @@ export class AppService {
     //this.loggerService.info(`USER REFRESH: ${JSON.stringify(user)}`);
   }
 
+  generateRecoveryToken(email: string, user_id: string) {
+    const jwtJti = uuidv4();
+    const tokenPayload = {
+      sub: user_id,
+      email,
+      jti: jwtJti,
+    };
+    const tokenHeader = {
+      kid: 'recovery',
+      alg: 'HS256',
+    };
+    const recoveryToken = this.jwt.sign(tokenPayload, {
+      privateKey: this.configService.get('jwt.recoveryPrivateKey'),
+      expiresIn: this.configService.get('jwt.recoveryExpiresIn'),
+      header: tokenHeader,
+    });
+
+    return { recoveryToken, jwtJti };
+  }
+
   async generateTokens(user_id: string, email: string) {
-    const tokens = await this.jwtService.generateTokens(user_id, email);
-    const userStoredRefreshToken = await this.refreshRepository.findOne({
+    const jwtJti = uuidv4();
+    const tokenPayload: UserPayload = {
+      sub: user_id,
+      email,
+    };
+
+    const refreshTokenPayload: UserPayload = {
+      sub: user_id,
+      email,
+      jti: jwtJti,
+    };
+
+    const accessTokenHeader = {
+      kid: 'access',
+      alg: 'HS256',
+    };
+
+    const refreshTokenHeader = {
+      kid: 'refresh',
+      alg: 'HS256',
+    };
+
+    const [access_token, refresh_token] = [
+      this.jwt.sign(tokenPayload, {
+        privateKey: this.configService.get('jwt.accessPrivateKey'),
+        expiresIn: this.configService.get('jwt.accessExpiresIn'),
+        algorithm: 'HS256',
+        header: accessTokenHeader,
+      }),
+      this.jwt.sign(refreshTokenPayload, {
+        privateKey: this.configService.get('jwt.refreshPrivateKey'),
+        expiresIn: this.configService.get('jwt.refreshExpiresIn'),
+        algorithm: 'HS256',
+        header: refreshTokenHeader,
+      }),
+    ];
+
+    await this.refreshRepository.upsert({
       where: { user_id: user_id },
+      create: { user_id: user_id, jti_refresh_token: jwtJti },
+      update: { jti_refresh_token: jwtJti },
     });
 
-    if (!userStoredRefreshToken?.jti_refresh_token) {
-      await this.refreshRepository.create({
-        data: {
-          jti_refresh_token: tokens.jti,
-          user_id: user_id,
-        },
-      });
-    }
-
-    await this.refreshRepository.update({
-      data: {
-        jti_refresh_token: tokens.jti,
-      },
-      where: {
-        user_id: user_id,
-      },
-    });
-
-    tokens.jti = undefined;
-    return tokens;
+    return {
+      access_token,
+      refresh_token,
+    };
   }
 
   generateActivateToken(email: string) {
     const tokenPayload = {
       email: email,
     };
+    const tokenHeader = {
+      kid: 'activate',
+      alg: 'HS256',
+    };
 
-    const activateToken = this.jwtService.generateActivateToken(
-      tokenPayload.email,
-    );
+    const activateToken = this.jwt.sign(tokenPayload, {
+      privateKey: this.configService.get('jwt.activatePrivateKey'),
+      expiresIn: this.configService.get('jwt.activateExpiresIn'),
+      algorithm: 'HS256',
+      header: tokenHeader,
+    });
 
     return activateToken;
   }

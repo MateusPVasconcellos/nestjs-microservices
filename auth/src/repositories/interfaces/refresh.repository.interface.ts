@@ -6,6 +6,17 @@ export interface RefreshRepository {
     where: Prisma.UserRefreshTokenWhereUniqueInput;
     data: Prisma.UserRefreshTokenUpdateInput;
   });
+  upsert(params: {
+    where: Prisma.UserRefreshTokenWhereUniqueInput;
+    create: Prisma.XOR<
+      Prisma.UserRefreshTokenCreateInput,
+      Prisma.UserRefreshTokenUncheckedCreateInput
+    >;
+    update: Prisma.XOR<
+      Prisma.UserRefreshTokenUpdateInput,
+      Prisma.UserRefreshTokenUncheckedUpdateInput
+    >;
+  });
   create(params: { data: Prisma.UserRefreshTokenCreateInput });
   delete(params: { where: Prisma.UserRefreshTokenWhereUniqueInput });
   findOne(params: {

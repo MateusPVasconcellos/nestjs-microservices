@@ -13,7 +13,7 @@
 			"method": "POST",
 			"backend": [
 				{
-					"host": ["http://192.168.1.8:8010"],
+					"host": ["http://192.168.1.5:8010"],
 					"url_pattern": "/signup",
 					"encoding": "string"
 				}
@@ -25,7 +25,7 @@
 			"method": "POST",
 			"backend": [
 				{
-					"host": ["http://192.168.1.8:8010"],
+					"host": ["http://192.168.1.5:8010"],
 					"method": "POST",
 					"url_pattern": "/signin",
 					"encoding": "safejson"
@@ -46,7 +46,7 @@
 			},
 			"backend": [
 				{
-					"host": ["http://192.168.1.8:8010"],
+					"host": ["http://192.168.1.5:8010"],
 					"method": "GET",
 					"url_pattern": "/users",
 					"encoding": "safejson",
@@ -85,7 +85,7 @@
 			},
 			"backend": [
 				{
-					"host": ["http://192.168.1.8:8000"],
+					"host": ["http://192.168.1.5:8000"],
 					"method": "GET",
 					"url_pattern": "/refresh",
 					"encoding": "safejson"
@@ -108,7 +108,7 @@
 			},
 			"backend": [
 				{
-					"host": ["http://192.168.1.8:8010"],
+					"host": ["http://192.168.1.5:8010"],
 					"method": "GET",
 					"url_pattern": "/activate",
 					"encoding": "safejson",
@@ -127,7 +127,7 @@
 			"input_query_strings": ["email"],
 			"backend": [
 				{
-					"host": ["http://192.168.1.8:8010"],
+					"host": ["http://192.168.1.5:8010"],
 					"method": "GET",
 					"url_pattern": "/resend-activate",
 					"encoding": "string"
@@ -141,7 +141,7 @@
 			"input_query_strings": ["email"],
 			"backend": [
 				{
-					"host": ["http://192.168.1.8:8010"],
+					"host": ["http://192.168.1.5:8010"],
 					"method": "GET",
 					"url_pattern": "/recovery-email",
 					"encoding": "string"
@@ -167,7 +167,7 @@
 			},
 			"backend": [
 				{
-					"host": ["http://192.168.1.8:8010"],
+					"host": ["http://192.168.1.5:8010"],
 					"method": "POST",
 					"url_pattern": "/recovery",
 					"encoding": "safejson",

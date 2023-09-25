@@ -50,10 +50,7 @@ class AuthQueue {
   @Process('authQueue.generateRecoveryToken')
   async generateRecoveryToken(job: Job<GenerateRecoveryTokenEvent>) {
     const { data } = job;
-    const token = this.appService.generateRecoveryToken(
-      data.email,
-      data.user_id,
-    );
+    const token = this.appService.generateRecoveryToken(data);
 
     await this.recoveryRepository.upsert({
       where: { user_id: data.user_id },

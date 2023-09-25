@@ -2,19 +2,16 @@ import { Controller, Get, Request } from '@nestjs/common';
 import { AppService } from './app.service';
 import { MessagePattern } from '@nestjs/microservices';
 import { Request as RequestExpress } from 'express';
+import { GenerateTokensDto } from './dtos/generate-tokens.dto';
+import { ValidateRecoveryTokenDto } from './dtos/validate-recovery.dto';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @MessagePattern({ cmd: 'generate-tokens' })
-  generateTokens(data: any) {
-    return this.appService.generateTokens(data.user_id, data.email);
-  }
-
-  @MessagePattern({ cmd: 'generate-activate-token' })
-  generateActivateToken(data: any) {
-    return this.appService.generateActivateToken(data.email);
+  generateTokens(data: GenerateTokensDto) {
+    return this.appService.generateTokens(data);
   }
 
   @Get('refresh')
@@ -23,7 +20,7 @@ export class AppController {
   }
 
   @MessagePattern({ cmd: 'validate-recovery-token' })
-  validateRecoveryToken(data: any) {
+  validateRecoveryToken(data: ValidateRecoveryTokenDto) {
     return this.appService.recovery(data);
   }
 }

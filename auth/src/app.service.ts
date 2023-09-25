@@ -9,9 +9,15 @@ import {
   RecoveryRepository,
 } from './repositories/interfaces/recovery.repository.interface';
 import { JwtService } from '@nestjs/jwt';
-import { UserPayload } from './models/user-payload.model';
+import { UserPayloadType } from './types/user-payload.type';
 import { v4 as uuidv4 } from 'uuid';
 import { ConfigService } from '@nestjs/config';
+import { GenerateTokensDto } from './dtos/generate-tokens.dto';
+import { ValidateRecoveryTokenDto } from './dtos/validate-recovery.dto';
+import { RefreshReturnType } from './types/refresh-return.type';
+import { GenerateRecoveryTokenEvent } from './events/generate-recovery-token.event';
+import { GenerateRecoveryReturnType } from './types/generate-recovery-return.type';
+import { GenerateTokensReturnType } from './types/generate-tokens-return.type';
 
 @Injectable()
 export class AppService {
@@ -24,7 +30,7 @@ export class AppService {
     private readonly configService: ConfigService,
   ) {}
 
-  async refresh(request: Request) {
+  async refresh(request: Request): Promise<RefreshReturnType> {
     const user_id = request.get('x-user');
     const jti = request.get('x-jti');
     const email = request.get('x-email');
@@ -38,12 +44,12 @@ export class AppService {
 
     const jwtJti = uuidv4();
 
-    const tokenPayload: UserPayload = {
+    const tokenPayload: UserPayloadType = {
       sub: user_id,
       email,
     };
 
-    const refreshTokenPayload: UserPayload = {
+    const refreshTokenPayload: UserPayloadType = {
       sub: user_id,
       email,
       jti: jwtJti,
@@ -85,16 +91,16 @@ export class AppService {
     };
   }
 
-  async recovery(data: any) {
+  async recovery({ user_id, jti }: ValidateRecoveryTokenDto): Promise<boolean> {
     const { jti_recovery_token } = await this.recoveryRepository.findOne({
-      where: { user_id: data.user_id },
+      where: { user_id: user_id },
     });
 
-    if (jti_recovery_token !== data.jti) return false;
+    if (jti_recovery_token !== jti) return false;
 
     await this.recoveryRepository.delete({
       where: {
-        user_id: data.user_id,
+        user_id: user_id,
       },
     });
 
@@ -102,7 +108,10 @@ export class AppService {
     //this.loggerService.info(`USER REFRESH: ${JSON.stringify(user)}`);
   }
 
-  generateRecoveryToken(email: string, user_id: string) {
+  generateRecoveryToken({
+    email,
+    user_id,
+  }: GenerateRecoveryTokenEvent): GenerateRecoveryReturnType {
     const jwtJti = uuidv4();
     const tokenPayload = {
       sub: user_id,
@@ -122,14 +131,17 @@ export class AppService {
     return { recoveryToken, jwtJti };
   }
 
-  async generateTokens(user_id: string, email: string) {
+  async generateTokens({
+    user_id,
+    email,
+  }: GenerateTokensDto): Promise<GenerateTokensReturnType> {
     const jwtJti = uuidv4();
-    const tokenPayload: UserPayload = {
+    const tokenPayload: UserPayloadType = {
       sub: user_id,
       email,
     };
 
-    const refreshTokenPayload: UserPayload = {
+    const refreshTokenPayload: UserPayloadType = {
       sub: user_id,
       email,
       jti: jwtJti,
@@ -172,7 +184,7 @@ export class AppService {
     };
   }
 
-  generateActivateToken(email: string) {
+  generateActivateToken(email: string): string {
     const tokenPayload = {
       email: email,
     };

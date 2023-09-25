@@ -9,15 +9,15 @@ import {
   RecoveryRepository,
 } from './repositories/interfaces/recovery.repository.interface';
 import { JwtService } from '@nestjs/jwt';
-import { UserPayloadType } from './types/user-payload.type';
 import { v4 as uuidv4 } from 'uuid';
 import { ConfigService } from '@nestjs/config';
-import { GenerateTokensDto } from './dtos/generate-tokens.dto';
-import { ValidateRecoveryTokenDto } from './dtos/validate-recovery.dto';
-import { RefreshReturnType } from './types/refresh-return.type';
+import { GenerateTokensDto } from './shared/dtos/generate-tokens.dto';
+import { ValidateRecoveryTokenDto } from './shared/dtos/validate-recovery.dto';
+import { RefreshReturnType } from './shared/types/refresh-return.type';
 import { GenerateRecoveryTokenEvent } from './events/generate-recovery-token.event';
-import { GenerateRecoveryReturnType } from './types/generate-recovery-return.type';
-import { GenerateTokensReturnType } from './types/generate-tokens-return.type';
+import { GenerateRecoveryReturnType } from './shared/types/generate-recovery-return.type';
+import { GenerateTokensReturnType } from './shared/types/generate-tokens-return.type';
+import { UserPayloadType } from './shared/types/user-payload.type';
 
 @Injectable()
 export class AppService {

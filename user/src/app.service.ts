@@ -20,6 +20,9 @@ import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
 import { GenerateRecoveryTokenEvent } from './events/generate-recovery-token.event';
 import { RecoveryPasswordDto } from './shared/dtos/recovery-password.dto';
+import { SigninReturnType } from './shared/types/signin-return.type';
+import { User } from './entities/user.entity';
+import { CreateUserDto } from './shared/dtos/create-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -31,7 +34,7 @@ export class UsersService {
     private readonly authProducer: AuthProducerService,
   ) {}
 
-  async signin(signinDto: SigninDto) {
+  async signin(signinDto: SigninDto): Promise<SigninReturnType> {
     const userStored = await this.usersRepository.findOne({
       where: { email: signinDto.email },
     });
@@ -49,7 +52,10 @@ export class UsersService {
     return tokens;
   }
 
-  async recovery(req: Request, recoveryPasswordDto: RecoveryPasswordDto) {
+  async recovery(
+    req: Request,
+    recoveryPasswordDto: RecoveryPasswordDto,
+  ): Promise<User> {
     const jti = req.get('x-jti');
     const user_id = req.get('x-user');
 
@@ -71,7 +77,7 @@ export class UsersService {
     });
   }
 
-  async resendActivate(email: string) {
+  async resendActivate(email: string): Promise<void> {
     const user = await this.usersRepository.findOne({
       where: { email: email },
       include: {
@@ -79,12 +85,12 @@ export class UsersService {
       },
     });
     if (user.active) throw new BadRequestException('User is already active');
-    await this.authProducer.resendActivateEmail(
+    return await this.authProducer.resendActivateEmail(
       new UserCreatedEvent(user.userDetail.name, email),
     );
   }
 
-  async sendRecoveryEmail(email: string) {
+  async sendRecoveryEmail(email: string): Promise<void> {
     const user = await this.usersRepository.findOne({
       where: { email: email },
       include: {
@@ -94,12 +100,12 @@ export class UsersService {
 
     if (!user) throw new BadRequestException();
 
-    await this.authProducer.generateRecoveryToken(
+    return await this.authProducer.generateRecoveryToken(
       new GenerateRecoveryTokenEvent(email, user.userDetail.name, user.id),
     );
   }
 
-  async activate(req: Request) {
+  async activate(req: Request): Promise<User> {
     const email = req.get('x-email');
     const user = await this.usersRepository.findOne({ where: { email } });
     if (user.active) throw new UnauthorizedException();
@@ -111,7 +117,7 @@ export class UsersService {
     return this.usersRepository.update(params);
   }
 
-  async createUser(createUserDto) {
+  async createUser(createUserDto: CreateUserDto): Promise<void> {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 8);
     createUserDto.password = hashedPassword;
     const user = await this.usersRepository.findOne({
@@ -143,14 +149,14 @@ export class UsersService {
     );
   }
 
-  async findAll() {
+  async findAll(): Promise<User[]> {
     const users = await this.usersRepository.findMany({
       include: { userDetail: true, userAddress: true },
     });
     return users;
   }
 
-  async validateUser(email: string, password: string) {
+  async validateUser(email: string, password: string): Promise<User> {
     const loginRequestBody = new SigninDto();
     loginRequestBody.email = email;
     loginRequestBody.password = password;

@@ -11,6 +11,18 @@
 			"kty": "oct",
 			"k": "base64secret",
 			"alg": "HS256"
+		},
+				{
+			"kid": "activate",
+			"kty": "oct",
+			"k": "base64secret",
+			"alg": "HS256"
+		},
+		{
+			"kid": "recovery",
+			"kty": "oct",
+			"k": "base64secret",
+			"alg": "HS256"
 		}
 	]
 }

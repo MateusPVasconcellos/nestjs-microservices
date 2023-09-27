@@ -4,6 +4,7 @@
 node_modules
 dist
 jwk.txt
+todo.txt
 .docker
 # Logs
 logs

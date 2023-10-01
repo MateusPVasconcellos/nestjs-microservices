@@ -13,7 +13,9 @@
 			"method": "POST",
 			"backend": [
 				{
-					"host": ["http://192.168.1.5:8010"],
+					"host": [
+						"http://172.17.0.1:8010"
+					],
 					"url_pattern": "/signup",
 					"encoding": "string"
 				}
@@ -25,7 +27,9 @@
 			"method": "POST",
 			"backend": [
 				{
-					"host": ["http://192.168.1.5:8010"],
+					"host": [
+						"http://172.17.0.1:8010"
+					],
 					"method": "POST",
 					"url_pattern": "/signin",
 					"encoding": "safejson"
@@ -46,7 +50,9 @@
 			},
 			"backend": [
 				{
-					"host": ["http://192.168.1.5:8010"],
+					"host": [
+						"http://172.17.0.1:8010"
+					],
 					"method": "GET",
 					"url_pattern": "/users",
 					"encoding": "safejson",
@@ -54,10 +60,18 @@
 					"extra_config": {
 						"proxy": {
 							"flatmap_filter": [
-								{ "type": "del", "args": ["collection.*.password"] },
+								{
+									"type": "del",
+									"args": [
+										"collection.*.password"
+									]
+								},
 								{
 									"type": "move",
-									"args": ["collection", "users"]
+									"args": [
+										"collection",
+										"users"
+									]
 								}
 							]
 						}
@@ -68,7 +82,11 @@
 		{
 			"@comment": "Refresh",
 			"endpoint": "/refresh",
-			"input_headers": ["x-email", "x-user", "x-jti"],
+			"input_headers": [
+				"x-email",
+				"x-user",
+				"x-jti"
+			],
 			"method": "GET",
 			"extra_config": {
 				"auth/validator": {
@@ -77,15 +95,26 @@
 					"operation_debug": true,
 					"disable_jwk_security": true,
 					"propagate_claims": [
-						["sub", "x-user"],
-						["jti", "x-jti"],
-						["email", "x-email"]
+						[
+							"sub",
+							"x-user"
+						],
+						[
+							"jti",
+							"x-jti"
+						],
+						[
+							"email",
+							"x-email"
+						]
 					]
 				}
 			},
 			"backend": [
 				{
-					"host": ["http://192.168.1.5:8000"],
+					"host": [
+						"http://172.17.0.1:8000"
+					],
 					"method": "GET",
 					"url_pattern": "/refresh",
 					"encoding": "safejson"
@@ -95,7 +124,9 @@
 		{
 			"@comment": "Activate User",
 			"endpoint": "/activate",
-			"input_headers": ["x-email"],
+			"input_headers": [
+				"x-email"
+			],
 			"method": "GET",
 			"extra_config": {
 				"auth/validator": {
@@ -103,18 +134,32 @@
 					"jwk_local_path": "./jwk.txt",
 					"operation_debug": true,
 					"disable_jwk_security": true,
-					"propagate_claims": [["email", "x-email"]]
+					"propagate_claims": [
+						[
+							"email",
+							"x-email"
+						]
+					]
 				}
 			},
 			"backend": [
 				{
-					"host": ["http://192.168.1.5:8010"],
+					"host": [
+						"http://172.17.0.1:8010"
+					],
 					"method": "GET",
 					"url_pattern": "/activate",
 					"encoding": "safejson",
 					"extra_config": {
 						"proxy": {
-							"flatmap_filter": [{ "type": "del", "args": ["password"] }]
+							"flatmap_filter": [
+								{
+									"type": "del",
+									"args": [
+										"password"
+									]
+								}
+							]
 						}
 					}
 				}
@@ -124,10 +169,14 @@
 			"@comment": "Resend Activate User Email",
 			"endpoint": "/resend-activate",
 			"method": "GET",
-			"input_query_strings": ["email"],
+			"input_query_strings": [
+				"email"
+			],
 			"backend": [
 				{
-					"host": ["http://192.168.1.5:8010"],
+					"host": [
+						"http://172.17.0.1:8010"
+					],
 					"method": "GET",
 					"url_pattern": "/resend-activate",
 					"encoding": "string"
@@ -138,10 +187,14 @@
 			"@comment": "Send Recovery Password Email",
 			"endpoint": "/recovery-email",
 			"method": "GET",
-			"input_query_strings": ["email"],
+			"input_query_strings": [
+				"email"
+			],
 			"backend": [
 				{
-					"host": ["http://192.168.1.5:8010"],
+					"host": [
+						"http://172.17.0.1:8010"
+					],
 					"method": "GET",
 					"url_pattern": "/recovery-email",
 					"encoding": "string"
@@ -151,7 +204,9 @@
 		{
 			"@comment": "Recovery Password",
 			"endpoint": "/recovery",
-			"input_headers": ["*"],
+			"input_headers": [
+				"*"
+			],
 			"method": "POST",
 			"extra_config": {
 				"auth/validator": {
@@ -160,20 +215,35 @@
 					"operation_debug": true,
 					"disable_jwk_security": true,
 					"propagate_claims": [
-						["sub", "x-user"],
-						["jti", "x-jti"]
+						[
+							"sub",
+							"x-user"
+						],
+						[
+							"jti",
+							"x-jti"
+						]
 					]
 				}
 			},
 			"backend": [
 				{
-					"host": ["http://192.168.1.5:8010"],
+					"host": [
+						"http://172.17.0.1:8010"
+					],
 					"method": "POST",
 					"url_pattern": "/recovery",
 					"encoding": "safejson",
 					"extra_config": {
 						"proxy": {
-							"flatmap_filter": [{ "type": "del", "args": ["password"] }]
+							"flatmap_filter": [
+								{
+									"type": "del",
+									"args": [
+										"password"
+									]
+								}
+							]
 						}
 					}
 				}
@@ -182,10 +252,23 @@
 	],
 	"extra_config": {
 		"security/cors": {
-			"allow_origins": ["*"],
-			"allow_methods": ["POST", "GET", "PUT", "DELETE"],
-			"allow_headers": ["Origin", "Authorization", "Content-Type"],
-			"expose_headers": ["Content-Length"],
+			"allow_origins": [
+				"*"
+			],
+			"allow_methods": [
+				"POST",
+				"GET",
+				"PUT",
+				"DELETE"
+			],
+			"allow_headers": [
+				"Origin",
+				"Authorization",
+				"Content-Type"
+			],
+			"expose_headers": [
+				"Content-Length"
+			],
 			"max_age": "12h"
 		}
 	}

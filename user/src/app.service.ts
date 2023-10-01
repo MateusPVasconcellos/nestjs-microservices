@@ -15,7 +15,7 @@ import { UserCreatedEvent } from './events/user-created.event';
 import { SigninDto } from './shared/dtos/signin.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
-import { bcrypt } from 'bcryptjs'
+import * as bcrypt from 'bcryptjs';
 import { validate } from 'class-validator';
 import { Request } from 'express';
 import { GenerateRecoveryTokenEvent } from './events/generate-recovery-token.event';
@@ -150,6 +150,7 @@ export class UsersService {
   }
 
   async findAll(): Promise<User[]> {
+    console.log('Lod maldito')
     const users = await this.usersRepository.findMany({
       include: { userDetail: true, userAddress: true },
     });

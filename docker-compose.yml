@@ -4,6 +4,7 @@ networks:
 services:
   loki:
     image: grafana/loki:2.4.0
+    container_name: loki
     volumes:
       - ./loki:/etc/loki
     ports:
@@ -15,6 +16,7 @@ services:
 
   promtail:
     image: grafana/promtail:2.4.0
+    container_name: promtail
     volumes:
       - /var/log:/var/log
       - ./promtail:/etc/promtail
@@ -27,6 +29,7 @@ services:
 
   grafana:
     image: grafana/grafana:latest
+    container_name: grafana
     user: "1000"
     volumes:
       - .docker/grafana:/var/lib/grafana
@@ -36,10 +39,11 @@ services:
     networks:
       - loki
 
-  krakend_ce:
+  krakend:
     # The :watch image restarts the service automatically when the configuration files change.
     # Do not use this image in production, it's meant to speed up your testing and development.
     image: devopsfaith/krakend:watch
+    container_name: krakend
     volumes:
       - ./krakend:/etc/krakend
     ports:
@@ -71,6 +75,11 @@ services:
       context: event
     ports:
       - "8020:8020"
+  mailer:
+    build:
+      context: mailer
+    ports:
+      - "8030:8030"
 
   auth-db:
     image: postgres:14

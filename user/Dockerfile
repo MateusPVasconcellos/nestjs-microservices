@@ -3,9 +3,11 @@ FROM node:18-alpine AS dependencies
 RUN mkdir /app
 WORKDIR /app
 
-COPY . .
 
-RUN npm install --legacy-peer-deps
-COPY package.json .
+COPY package.json /app/
+COPY . /app/
+
+RUN npm install
 EXPOSE 8010
-CMD ["npm", "run", "start"]
+
+CMD ["npm", "run", "start:dev"]

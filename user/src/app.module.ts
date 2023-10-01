@@ -46,4 +46,4 @@ import { LocalStrategy } from './strategies/local.strategy';
   ],
   exports: [AuthProducerService],
 })
-export class AppModule {}
+export class AppModule { }

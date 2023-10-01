@@ -16,7 +16,7 @@ services:
   promtail:
     image: grafana/promtail:2.4.0
     volumes:
-      - //wsl$/docker-desktop-data/data/docker/containers/*/*-json.log:/var/log
+      - /var/log:/var/log
       - ./promtail:/etc/promtail
     # ports:
     #   - "1514:1514" # this is only needed if you are going to send syslogs
@@ -46,7 +46,7 @@ services:
       - "1234:1234"
       - "8080:8080"
       - "8090:8090"
-    command: ["run", "-d", "-c", "/etc/krakend/krakend.json"]
+    command: [ "run", "-d", "-c", "/etc/krakend/krakend.json" ]
 
   redis:
     image: "redis:alpine"

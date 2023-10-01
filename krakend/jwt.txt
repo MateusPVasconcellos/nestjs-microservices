@@ -1,0 +1,28 @@
+{
+	"keys": [
+		{
+			"kid": "access",
+			"kty": "oct",
+			"k": "c2VjcmV0",
+			"alg": "HS256"
+		},
+		{
+			"kid": "refresh",
+			"kty": "oct",
+			"k": "c2VjcmV0",
+			"alg": "HS256"
+		},
+				{
+			"kid": "activate",
+			"kty": "oct",
+			"k": "c2VjcmV0",
+			"alg": "HS256"
+		},
+		{
+			"kid": "recovery",
+			"kty": "oct",
+			"k": "c2VjcmV0",
+			"alg": "HS256"
+		}
+	]
+}

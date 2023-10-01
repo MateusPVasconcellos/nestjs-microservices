@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Prisma, UserRecoveryToken } from '@prisma/client';
-import { RecoveryRepository } from '../interfaces/Recovery.repository.interface';
 import { DefaultArgs } from '@prisma/client/runtime/library';
+import { RecoveryRepository } from '../interfaces/recovery.repository.interface';
 
 export class RecoveryInMemoryRepository implements RecoveryRepository {
   upsert(params: {

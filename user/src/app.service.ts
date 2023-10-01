@@ -15,8 +15,8 @@ import { UserCreatedEvent } from './events/user-created.event';
 import { SigninDto } from './shared/dtos/signin.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
+import { bcrypt } from 'bcryptjs'
 import { validate } from 'class-validator';
-import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
 import { GenerateRecoveryTokenEvent } from './events/generate-recovery-token.event';
 import { RecoveryPasswordDto } from './shared/dtos/recovery-password.dto';
@@ -32,7 +32,7 @@ export class UsersService {
     @Inject(USERS_REPOSITORY_TOKEN)
     private readonly usersRepository: UsersRepository,
     private readonly authProducer: AuthProducerService,
-  ) {}
+  ) { }
 
   async signin(signinDto: SigninDto): Promise<SigninReturnType> {
     const userStored = await this.usersRepository.findOne({
@@ -141,7 +141,7 @@ export class UsersService {
             cpf_cnpj: createUserDto.cpf_cnpj,
           },
         },
-        roleEnum: { connect: { id: 'clm6xd8f50000tyakoct7s7t8' } },
+        roleEnum: { connect: { id: 'cln7hdhb30000jd0deu344j9j' } },
       },
     });
     return await this.authProducer.userCreated(

@@ -20,7 +20,7 @@ import { GenerateTokensReturnType } from './shared/types/generate-tokens-return.
 import { UserPayloadType } from './shared/types/user-payload.type';
 
 @Injectable()
-export class AppService {
+export class AuthService {
   constructor(
     @Inject(REFRESH_REPOSITORY_TOKEN)
     private readonly refreshRepository: RefreshRepository,
@@ -28,7 +28,7 @@ export class AppService {
     private readonly recoveryRepository: RecoveryRepository,
     private readonly jwt: JwtService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   async refresh(request: Request): Promise<RefreshReturnType> {
     const user_id = request.get('x-user');

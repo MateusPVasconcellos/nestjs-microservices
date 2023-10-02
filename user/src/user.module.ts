@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { UsersController } from './app.controller';
-import { UsersService } from './app.service';
+import { UsersController } from './user.controller';
+import { UsersService } from './user.service';
 import { PrismaService } from './database/prisma.service';
 import redisConfig from './config/redis.config';
 import { ConfigModule, ConfigService, ConfigType } from '@nestjs/config';
@@ -9,9 +9,11 @@ import { provideUsersRepository } from './repositories/user.repository.provider'
 import { AuthProducerService } from './jobs/auth-producer.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { LocalStrategy } from './strategies/local.strategy';
+import { LoggerModule } from './shared/logger/logger.module';
 
 @Module({
   imports: [
+    LoggerModule,
     BullModule.registerQueue({
       name: 'authQueue',
     }),

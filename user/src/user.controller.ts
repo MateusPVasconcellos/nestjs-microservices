@@ -7,7 +7,7 @@ import {
   Request,
   Query,
 } from '@nestjs/common';
-import { UsersService } from './app.service';
+import { UsersService } from './user.service';
 import { CreateUserDto } from './shared/dtos/create-user.dto';
 import { SigninDto } from './shared/dtos/signin.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -16,7 +16,7 @@ import { RecoveryPasswordDto } from './shared/dtos/recovery-password.dto';
 
 @Controller()
 export class UsersController {
-  constructor(private readonly appService: UsersService) {}
+  constructor(private readonly appService: UsersService) { }
 
   @Post('signup')
   createUser(@Body() createUserDto: CreateUserDto) {

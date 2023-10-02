@@ -23,6 +23,7 @@ import { RecoveryPasswordDto } from './shared/dtos/recovery-password.dto';
 import { SigninReturnType } from './shared/types/signin-return.type';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './shared/dtos/create-user.dto';
+import { LoggerService } from './shared/logger/logger.service';
 
 @Injectable()
 export class UsersService {
@@ -32,7 +33,10 @@ export class UsersService {
     @Inject(USERS_REPOSITORY_TOKEN)
     private readonly usersRepository: UsersRepository,
     private readonly authProducer: AuthProducerService,
-  ) { }
+    private readonly loggerService: LoggerService,
+  ) {
+    this.loggerService.contextName = UsersService.name;
+  }
 
   async signin(signinDto: SigninDto): Promise<SigninReturnType> {
     const userStored = await this.usersRepository.findOne({
@@ -48,7 +52,7 @@ export class UsersService {
         { user_id: userStored.id, email: userStored.email },
       ),
     );
-
+    this.loggerService.info(`User ${userStored.id} signin`);
     return tokens;
   }
 

@@ -1,13 +1,13 @@
 import { Controller, Get, Request } from '@nestjs/common';
-import { AppService } from './app.service';
+import { AuthService } from './auth.service';
 import { MessagePattern } from '@nestjs/microservices';
 import { Request as RequestExpress } from 'express';
 import { GenerateTokensDto } from './shared/dtos/generate-tokens.dto';
 import { ValidateRecoveryTokenDto } from './shared/dtos/validate-recovery.dto';
 
 @Controller()
-export class AppController {
-  constructor(private readonly appService: AppService) { }
+export class AuthController {
+  constructor(private readonly appService: AuthService) { }
 
   @MessagePattern({ cmd: 'generate-tokens' })
   generateTokens(data: GenerateTokensDto) {

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
 import { PrismaService } from './database/prisma.service';
 import { ConfigModule, ConfigService, ConfigType } from '@nestjs/config';
 import { BullModule } from '@nestjs/bull';
@@ -12,9 +12,11 @@ import { AuthQueue } from './queues/auth-queue';
 import { MailerProducerService } from './jobs/mailer-producer.service';
 import { provideRefreshRepository } from './repositories/providers/refresh.repository.provider';
 import { provideRecoveryRepository } from './repositories/providers/recovery.repository.provider';
+import { LoggerModule } from './shared/logger/logger.module';
 
 @Module({
   imports: [
+    LoggerModule,
     JwtModule.register({}),
     ConfigModule.forRoot({ load: [jwtConfig], isGlobal: true }),
     BullModule.registerQueue({
@@ -44,9 +46,9 @@ import { provideRecoveryRepository } from './repositories/providers/recovery.rep
       },
     ]),
   ],
-  controllers: [AppController],
+  controllers: [AuthController],
   providers: [
-    AppService,
+    AuthService,
     PrismaService,
     AuthQueue,
     MailerProducerService,
@@ -54,4 +56,4 @@ import { provideRecoveryRepository } from './repositories/providers/recovery.rep
     ...provideRecoveryRepository(),
   ],
 })
-export class AppModule {}
+export class AppModule { }

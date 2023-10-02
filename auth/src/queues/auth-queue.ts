@@ -1,7 +1,7 @@
 import { OnQueueFailed, Process, Processor } from '@nestjs/bull';
 import { HttpException, Inject } from '@nestjs/common';
 import { Job } from 'bull';
-import { AppService } from 'src/app.service';
+import { AuthService } from 'src/auth.service';
 import { GenerateRecoveryTokenEvent } from 'src/events/generate-recovery-token.event';
 import { ActivateEmailEvent } from 'src/events/send-activate-email.event';
 import { RecoveryEmailEvent } from 'src/events/send-recovery-email.event';
@@ -18,8 +18,8 @@ class AuthQueue {
     private readonly mailerProducer: MailerProducerService,
     @Inject(RECOVERY_REPOSITORY_TOKEN)
     private readonly recoveryRepository: RecoveryRepository,
-    private readonly appService: AppService,
-  ) {}
+    private readonly appService: AuthService,
+  ) { }
 
   @OnQueueFailed()
   handler(job: Job, error: Error) {

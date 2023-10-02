@@ -1,15 +1,17 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { MailerController } from './mailer.controller';
+import { MailerService } from './mailer.service';
 import { MailerModule, MailerOptions } from '@nestjs-modules/mailer';
 import { ConfigModule, ConfigType } from '@nestjs/config';
 import mailConfig from './config/mail.config';
 import { MailerQueue } from './queues/mailer-queue';
 import { BullModule } from '@nestjs/bull';
 import redisConfig from './config/redis.config';
+import { LoggerModule } from './logger/logger.module';
 
 @Module({
   imports: [
+    LoggerModule,
     MailerModule.forRootAsync({
       imports: [ConfigModule.forRoot({ load: [mailConfig] })],
       useFactory: (
@@ -40,7 +42,7 @@ import redisConfig from './config/redis.config';
       inject: [redisConfig.KEY],
     }),
   ],
-  controllers: [AppController],
-  providers: [AppService, MailerQueue],
+  controllers: [MailerController],
+  providers: [MailerService, MailerQueue],
 })
-export class AppModule {}
+export class AppModule { }

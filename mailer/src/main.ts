@@ -1,9 +1,9 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './mailer.module';
+import { MailerModule } from './mailer.module';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(MailerModule);
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.enableCors({ origin: '*', allowedHeaders: '*', methods: '*' });
   await app.listen(8020);

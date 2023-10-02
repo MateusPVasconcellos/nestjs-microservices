@@ -75,10 +75,12 @@ export class UsersService {
     }
     const hashedPassword = await bcrypt.hash(recoveryPasswordDto.password, 8);
 
-    return await this.usersRepository.update({
+    const user = await this.usersRepository.update({
       where: { id: user_id },
       data: { password: hashedPassword },
     });
+    this.loggerService.info(`User ${user.id} recovery`);
+    return user;
   }
 
   async resendActivate(email: string): Promise<void> {
@@ -89,6 +91,7 @@ export class UsersService {
       },
     });
     if (user.active) throw new BadRequestException('User is already active');
+    this.loggerService.info(`User ${user.id} resendActivate`);
     return await this.authProducer.resendActivateEmail(
       new UserCreatedEvent(user.userDetail.name, email),
     );
@@ -103,7 +106,7 @@ export class UsersService {
     });
 
     if (!user) throw new BadRequestException();
-
+    this.loggerService.info(`User ${user.id} sendRecoveryEmail`);
     return await this.authProducer.generateRecoveryToken(
       new GenerateRecoveryTokenEvent(email, user.userDetail.name, user.id),
     );
@@ -118,7 +121,9 @@ export class UsersService {
       where: { email },
       data: { active: true },
     };
-    return this.usersRepository.update(params);
+    const updatedUser = await this.usersRepository.update(params);
+    this.loggerService.info(`User ${updatedUser.id} activate`);
+    return updatedUser;
   }
 
   async createUser(createUserDto: CreateUserDto): Promise<void> {
@@ -134,7 +139,7 @@ export class UsersService {
       throw new ConflictException();
     }
 
-    await this.usersRepository.create({
+    const createdUser = await this.usersRepository.create({
       data: {
         email: createUserDto.email,
         password: createUserDto.password,
@@ -148,16 +153,17 @@ export class UsersService {
         roleEnum: { connect: { id: 'cln7hdhb30000jd0deu344j9j' } },
       },
     });
+    this.loggerService.info(`User ${createdUser.id} created`);
     return await this.authProducer.userCreated(
       new UserCreatedEvent(createUserDto.name, createUserDto.email),
     );
   }
 
   async findAll(): Promise<User[]> {
-    console.log('Lod maldito')
     const users = await this.usersRepository.findMany({
       include: { userDetail: true, userAddress: true },
     });
+    this.loggerService.info(`Called FindAll`);
     return users;
   }
 

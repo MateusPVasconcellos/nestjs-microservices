@@ -7,7 +7,9 @@ import mailConfig from './config/mail.config';
 import { MailerQueue } from './queues/mailer-queue';
 import { BullModule } from '@nestjs/bull';
 import redisConfig from './config/redis.config';
-import { LoggerModule } from './logger/logger.module';
+import { LoggerModule } from './shared/logger/logger.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { LoggingInterceptor } from './shared/interceptor/loggin.interceptor';
 
 @Module({
   imports: [
@@ -43,6 +45,9 @@ import { LoggerModule } from './logger/logger.module';
     }),
   ],
   controllers: [MailerController],
-  providers: [MailerService, MailerQueue],
+  providers: [MailerService, MailerQueue, {
+    provide: APP_INTERCEPTOR,
+    useClass: LoggingInterceptor,
+  }],
 })
-export class AppModule { }
+export class MailerModule { }

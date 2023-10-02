@@ -10,6 +10,8 @@ import { AuthProducerService } from './jobs/auth-producer.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { LocalStrategy } from './strategies/local.strategy';
 import { LoggerModule } from './shared/logger/logger.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { LoggingInterceptor } from './shared/interceptors/loggin.interceptor';
 
 @Module({
   imports: [
@@ -40,6 +42,10 @@ import { LoggerModule } from './shared/logger/logger.module';
   ],
   controllers: [UsersController],
   providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
     UsersService,
     PrismaService,
     ...provideUsersRepository(),
@@ -48,4 +54,4 @@ import { LoggerModule } from './shared/logger/logger.module';
   ],
   exports: [AuthProducerService],
 })
-export class AppModule { }
+export class UserModule { }

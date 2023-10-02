@@ -1,6 +1,6 @@
 import { instanceToPlain } from 'class-transformer';
 import { IsNotEmpty, Length } from 'class-validator';
-import { Match } from 'src/shared/decorators/match-decorator';
+import { Match } from '../decorators/match.decorator';
 
 export class RecoveryPasswordDto {
   @IsNotEmpty()

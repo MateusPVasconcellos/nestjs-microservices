@@ -1,12 +1,12 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './user.module';
+import { UserModule } from './user.module';
 import { ValidationPipe } from '@nestjs/common';
 import { PrismaService } from './database/prisma.service';
 import { AllExceptionsFilter } from './shared/filters/exception.filter';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(UserModule);
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.REDIS,
   });

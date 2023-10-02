@@ -13,6 +13,8 @@ import { MailerProducerService } from './jobs/mailer-producer.service';
 import { provideRefreshRepository } from './repositories/providers/refresh.repository.provider';
 import { provideRecoveryRepository } from './repositories/providers/recovery.repository.provider';
 import { LoggerModule } from './shared/logger/logger.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { LoggingInterceptor } from './shared/interceptors/loggin.interceptor';
 
 @Module({
   imports: [
@@ -54,6 +56,10 @@ import { LoggerModule } from './shared/logger/logger.module';
     MailerProducerService,
     ...provideRefreshRepository(),
     ...provideRecoveryRepository(),
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
   ],
 })
-export class AppModule { }
+export class AuthModule { }

@@ -50,4 +50,4 @@ import { LoggingInterceptor } from './shared/interceptor/loggin.interceptor';
     useClass: LoggingInterceptor,
   }],
 })
-export class MailerModule { }
+export class AppModule { }

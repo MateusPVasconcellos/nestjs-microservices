@@ -6,8 +6,7 @@ import {
 } from '@nestjs/common';
 import { Observable, throwError } from 'rxjs';
 import { LoggerService } from '../logger/logger.service';
-import { catchError, finalize, tap } from 'rxjs/operators';
-
+import { catchError, tap } from 'rxjs/operators';
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
     constructor(private readonly loggerService: LoggerService) {
@@ -18,6 +17,7 @@ export class LoggingInterceptor implements NestInterceptor {
         const request = context.switchToHttp().getRequest();
         const { url } = request;
         const startTime = Date.now();
+        const method = context.getHandler()
         return next
             .handle()
             .pipe(
@@ -26,7 +26,7 @@ export class LoggingInterceptor implements NestInterceptor {
                     const elapsedTime = endTime - startTime;
                     const formattedStartTime = new Date(startTime).toLocaleString('pt-BR');
                     const formattedEndTime = new Date(endTime).toLocaleString('pt-BR');
-                    this.loggerService.error(`[${url}] Start: ${formattedStartTime}, End: ${formattedEndTime}, Elapsed: ${elapsedTime}ms`, error.stack);
+                    this.loggerService.error(`[${url}] [${method}] Start: ${formattedStartTime}, End: ${formattedEndTime}, Elapsed: ${elapsedTime}ms`, error.stack);
                     return throwError(() => error);
                 }),
                 tap({

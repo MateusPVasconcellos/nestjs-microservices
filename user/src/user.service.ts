@@ -91,7 +91,9 @@ export class UsersService {
       },
     });
     if (user.active) throw new BadRequestException('User is already active');
+
     this.loggerService.info(`User ${user.id} resendActivate`);
+
     return await this.authProducer.resendActivateEmail(
       new UserCreatedEvent(user.userDetail.name, email),
     );

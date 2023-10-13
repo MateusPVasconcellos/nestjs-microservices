@@ -79,7 +79,7 @@ export class UsersService {
       where: { id: user_id },
       data: { password: hashedPassword },
     });
-    this.loggerService.info(`User ${user.id} recovery`);
+    this.loggerService.info(`User ${user?.id} recovery`);
     return user;
   }
 
@@ -90,12 +90,12 @@ export class UsersService {
         userDetail: true,
       },
     });
-    if (user.active) throw new BadRequestException('User is already active');
+    if (!user || user?.active) throw new BadRequestException();
 
-    this.loggerService.info(`User ${user.id} resendActivate`);
+    this.loggerService.info(`User ${user?.id} resendActivate`);
 
     return await this.authProducer.resendActivateEmail(
-      new UserCreatedEvent(user.userDetail.name, email),
+      new UserCreatedEvent(user?.userDetail.name, email),
     );
   }
 
@@ -117,7 +117,7 @@ export class UsersService {
   async activate(req: Request): Promise<User> {
     const email = req.get('x-email');
     const user = await this.usersRepository.findOne({ where: { email } });
-    if (user.active) throw new UnauthorizedException();
+    if (!user || user?.active) throw new BadRequestException();
 
     const params = {
       where: { email },
@@ -188,17 +188,15 @@ export class UsersService {
       where: { email },
     });
 
-    if (user) {
-      const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!user) throw new BadRequestException();
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
-      if (isPasswordValid) {
-        return {
-          ...user,
-          password: undefined,
-        };
-      }
+    if (isPasswordValid) {
+      return {
+        ...user,
+        password: undefined,
+      };
     }
-
     throw new UnauthorizedException();
   }
 }

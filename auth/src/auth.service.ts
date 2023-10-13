@@ -18,6 +18,7 @@ import { GenerateRecoveryTokenEvent } from './events/generate-recovery-token.eve
 import { GenerateRecoveryReturnType } from './shared/types/generate-recovery-return.type';
 import { GenerateTokensReturnType } from './shared/types/generate-tokens-return.type';
 import { UserPayloadType } from './shared/types/user-payload.type';
+import { LoggerService } from './shared/logger/logger.service';
 
 @Injectable()
 export class AuthService {
@@ -28,7 +29,10 @@ export class AuthService {
     private readonly recoveryRepository: RecoveryRepository,
     private readonly jwt: JwtService,
     private readonly configService: ConfigService,
-  ) { }
+    private readonly loggerService: LoggerService,
+  ) {
+    this.loggerService.contextName = AuthService.name;
+  }
 
   async refresh(request: Request): Promise<RefreshReturnType> {
     const user_id = request.get('x-user');

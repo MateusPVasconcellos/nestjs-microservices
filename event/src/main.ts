@@ -1,8 +1,25 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { UserModule } from './user.module';
+import { ValidationPipe } from '@nestjs/common';
+import { PrismaService } from './database/prisma.service';
+import { AllExceptionsFilter } from './shared/filters/exception.filter';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { EventModule } from './event.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
+  const app = await NestFactory.create(EventModule);
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.REDIS,
+  });
+
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalFilters(new AllExceptionsFilter());
+
+  const prismaService = app.get(PrismaService);
+  await prismaService.enableShutdownHooks(app);
+  app.enableCors({ origin: '*', allowedHeaders: '*', methods: '*' });
+
+  await app.startAllMicroservices();
+  await app.listen(8010);
 }
 bootstrap();

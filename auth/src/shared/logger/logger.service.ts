@@ -74,7 +74,7 @@ export class LoggerService {
                 format.printf((info) => {
                     return (
                         `${info?.timestamp} [${info.level.toLocaleUpperCase()}] [${info?.meta?.context ?? ''
-                        }] [${info?.meta?.idempotency}] ` + `${info?.message} ${JSON.stringify(info?.meta)}`
+                        }] ` + `${info?.message} ${JSON.stringify(info?.meta)}`
                     );
                 }),
             ),

@@ -88,7 +88,7 @@ export class AuthService {
       create: { user_id: user_id, jti_refresh_token: jwtJti },
       update: { jti_refresh_token: jwtJti },
     });
-    //this.loggerService.info(`USER REFRESH: ${JSON.stringify(user)}`);
+    this.loggerService.info(`User ${user_id} refresh`);
     return {
       access_token,
       refresh_token,
@@ -108,8 +108,8 @@ export class AuthService {
       },
     });
 
+    this.loggerService.info(`User ${user_id} recovery`);
     return true;
-    //this.loggerService.info(`USER REFRESH: ${JSON.stringify(user)}`);
   }
 
   generateRecoveryToken({
@@ -132,6 +132,8 @@ export class AuthService {
       header: tokenHeader,
     });
 
+
+    this.loggerService.info(`User ${user_id} generate recovery`);
     return { recoveryToken, jwtJti };
   }
 
@@ -182,6 +184,7 @@ export class AuthService {
       update: { jti_refresh_token: jwtJti },
     });
 
+    this.loggerService.info(`User ${user_id} generate tokens`);
     return {
       access_token,
       refresh_token,
@@ -204,6 +207,7 @@ export class AuthService {
       header: tokenHeader,
     });
 
+    this.loggerService.info(`User ${email} generate activate`);
     return activateToken;
   }
 }

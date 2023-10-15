@@ -7,6 +7,7 @@ import {
 import { Observable, throwError } from 'rxjs';
 import { LoggerService } from '../logger/logger.service';
 import { catchError, tap } from 'rxjs/operators';
+import { extractStackTrace } from '../utils/extract-stack-trace';
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
     constructor(private readonly loggerService: LoggerService) {
@@ -28,7 +29,7 @@ export class LoggingInterceptor implements NestInterceptor {
                     const exception = {
                         exception: error?.message,
                         status: error?.response?.statusCode,
-                        stackTrace: this.extractStackTrace(error.stack),
+                        stackTrace: extractStackTrace(error.stack),
                     };
                     this.loggerService.error(`[${url}] Start: ${formattedStartTime}, End: ${formattedEndTime}, Elapsed: ${elapsedTime}ms ${JSON.stringify(exception)}`);
                     return throwError(() => error);
@@ -44,9 +45,5 @@ export class LoggingInterceptor implements NestInterceptor {
                     },
                 }),
             );
-    }
-    private extractStackTrace(stack: string): string {
-        const match = / at (.+)/.exec(stack);
-        return match ? match[1] : stack;
     }
 }

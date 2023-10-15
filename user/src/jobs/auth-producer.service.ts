@@ -12,18 +12,18 @@ class AuthProducerService {
   }
 
   async userCreated(event: UserCreatedEvent) {
-    this.loggerService.info(`[authQueue.userCreated] ${JSON.stringify(event)}`)
     await this.authQueue.add('authQueue.userCreated', event);
+    this.loggerService.info(`[authQueue.userCreated] ${JSON.stringify(event)}`)
   }
 
   async resendActivateEmail(event: UserCreatedEvent) {
-    this.loggerService.info(`[authQueue.resendActivateEmail] ${JSON.stringify(event)}`)
     await this.authQueue.add('authQueue.resendActivateEmail', event);
+    this.loggerService.info(`[authQueue.resendActivateEmail] ${JSON.stringify(event)}`)
   }
 
   async generateRecoveryToken(event: GenerateRecoveryTokenEvent) {
-    this.loggerService.info(`[authQueue.generateRecoveryToken] ${JSON.stringify(event)}`)
     await this.authQueue.add('authQueue.generateRecoveryToken', event);
+    this.loggerService.info(`[authQueue.generateRecoveryToken] ${JSON.stringify(event)}`)
   }
 }
 

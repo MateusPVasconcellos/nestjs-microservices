@@ -11,6 +11,8 @@ import {
   RECOVERY_REPOSITORY_TOKEN,
   RecoveryRepository,
 } from 'src/repositories/interfaces/recovery.repository.interface';
+import { LoggerService } from 'src/shared/logger/logger.service';
+import { extractStackTrace } from 'src/shared/utils/extract-stack-trace';
 
 @Processor('authQueue')
 class AuthQueue {
@@ -19,16 +21,25 @@ class AuthQueue {
     @Inject(RECOVERY_REPOSITORY_TOKEN)
     private readonly recoveryRepository: RecoveryRepository,
     private readonly appService: AuthService,
-  ) { }
+    private readonly loggerService: LoggerService,
+  ) {
+    this.loggerService.contextName = AuthQueue.name;
+  }
 
   @OnQueueFailed()
-  handler(job: Job, error: Error) {
-    console.log(`Fired Excption from ${job.name}:`, error);
+  handler(job: Job, error: any) {
+    const exception = {
+      exception: error?.message,
+      status: error?.response?.statusCode,
+      stackTrace: extractStackTrace(error.stack),
+    };
+    this.loggerService.error(`[${job.name}] ${JSON.stringify(exception)}`);
     throw new HttpException(error.message, 401);
   }
 
   @Process('authQueue.userCreated')
   async generateActivateToken(job: Job<UserCreatedEvent>) {
+    this.loggerService.info(`Event ${job.name} received`);
     const { data } = job;
     const token = this.appService.generateActivateToken(data.email);
 
@@ -39,6 +50,7 @@ class AuthQueue {
 
   @Process('authQueue.resendActivateEmail')
   async regenerateActivateToken(job: Job<UserCreatedEvent>) {
+    this.loggerService.info(`Event ${job.name} received`);
     const { data } = job;
     const token = this.appService.generateActivateToken(data.email);
 
@@ -49,6 +61,7 @@ class AuthQueue {
 
   @Process('authQueue.generateRecoveryToken')
   async generateRecoveryToken(job: Job<GenerateRecoveryTokenEvent>) {
+    this.loggerService.info(`Event ${job.name} received`);
     const { data } = job;
     const token = this.appService.generateRecoveryToken(data);
 

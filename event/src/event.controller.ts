@@ -7,6 +7,6 @@ export class EventController {
 
   @Post('event')
   createEvent(): string {
-    return this.appService.getHello();
+    return this.appService.createEvent();
   }
 }

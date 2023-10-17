@@ -8,6 +8,20 @@
 	"name": "api-gateway",
 	"endpoints": [
 		{
+			"@comment": "Create Event",
+			"endpoint": "/event",
+			"method": "POST",
+			"backend": [
+				{
+					"host": [
+						"http://172.17.0.1:8030"
+					],
+					"url_pattern": "/event",
+					"encoding": "string"
+				}
+			]
+		},
+		{
 			"@comment": "User Signup",
 			"endpoint": "/signup",
 			"method": "POST",

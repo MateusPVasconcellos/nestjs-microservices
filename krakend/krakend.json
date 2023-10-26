@@ -11,6 +11,14 @@
 			"@comment": "Create Event",
 			"endpoint": "/event",
 			"method": "POST",
+			"extra_config": {
+				"auth/validator": {
+					"alg": "HS256",
+					"jwk_local_path": "./jwk.txt",
+					"operation_debug": true,
+					"disable_jwk_security": true
+				}
+			},
 			"backend": [
 				{
 					"host": [

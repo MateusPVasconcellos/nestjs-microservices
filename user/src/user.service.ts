@@ -45,7 +45,6 @@ export class UsersService {
     if (userStored?.active === false) {
       throw new ForbiddenException();
     }
-
     const tokens = await lastValueFrom(
       this.authClient.send(
         { cmd: 'generate-tokens' },
@@ -152,7 +151,7 @@ export class UsersService {
             cpf_cnpj: createUserDto.cpf_cnpj,
           },
         },
-        roleEnum: { connect: { id: 'cln7hdhb30000jd0deu344j9j' } },
+        roleEnum: { connect: { id: process.env.USER_ID } },
       },
     });
     this.loggerService.info(`User ${createdUser.id} created`);

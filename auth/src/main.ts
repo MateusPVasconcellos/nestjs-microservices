@@ -14,6 +14,14 @@ async function bootstrap() {
     transport: Transport.REDIS,
   });
 
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.TCP,
+    options: {
+      host: '127.0.0.1',
+      port: 3002
+    }
+  });
+
   const prismaService = app.get(PrismaService);
   await prismaService.enableShutdownHooks(app);
   app.enableCors({ origin: '*', allowedHeaders: '*', methods: '*' });

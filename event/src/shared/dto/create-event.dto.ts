@@ -1,26 +1,6 @@
 import { instanceToPlain } from "class-transformer";
 import { IsDate, IsNotEmpty, MaxLength, ValidateNested } from "class-validator";
 
-export class CreateEventDto {
-  @IsNotEmpty()
-  @IsDate()
-  time?: Date;
-
-  @IsNotEmpty()
-  @MaxLength(500)
-  description?: string;
-
-  @IsNotEmpty()
-  user_id?: string;
-
-  @ValidateNested()
-  eventAddress?: EventAddress;
-
-  toJSON() {
-    return instanceToPlain(this);
-  }
-}
-
 export class EventJob {
   event_id?: string;
   description?: string;
@@ -49,4 +29,24 @@ export class EventCandidate {
 export class EventCollaborator {
   user_id?: string
   job_id?: string
+}
+
+export class CreateEventDto {
+  @IsNotEmpty()
+  @IsDate()
+  time?: Date;
+
+  @IsNotEmpty()
+  @MaxLength(500)
+  description?: string;
+
+  @IsNotEmpty()
+  user_id?: string;
+
+  @ValidateNested()
+  eventAddress?: EventAddress;
+
+  toJSON() {
+    return instanceToPlain(this);
+  }
 }

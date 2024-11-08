@@ -40,10 +40,10 @@ import { LoggingInterceptor } from './shared/interceptors/loggin.interceptor';
     ClientsModule.register([
       {
         name: 'USER_SERVICE',
-        transport: Transport.REDIS,
+        transport: Transport.TCP,
         options: {
-          host: new ConfigService().get('redis.host'),
-          port: new ConfigService().get('redis.port'),
+          host: '127.0.0.1',
+          port: 3001,
         },
       },
     ]),

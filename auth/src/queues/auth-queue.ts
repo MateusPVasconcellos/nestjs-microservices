@@ -52,6 +52,7 @@ class AuthQueue {
   async regenerateActivateToken(job: Job<UserCreatedEvent>) {
     this.loggerService.info(`Event ${job.name} received`);
     const { data } = job;
+    console.log(data.email)
     const token = this.appService.generateActivateToken(data.email);
 
     await this.mailerProducer.sendActivateEmail(

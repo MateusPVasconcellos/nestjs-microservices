@@ -59,6 +59,16 @@ services:
     container_name: redis
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
+  
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - "5672:5672"   # Porta padrão do RabbitMQ para AMQP
+      - "15672:15672" # Porta padrão para o painel de gerenciamento do RabbitMQ
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
 
   auth:
     build:

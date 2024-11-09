@@ -20,7 +20,6 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@nestjs/bull": "^10.0.1",
     "@nestjs/common": "^9.4.3",
     "@nestjs/config": "^3.0.0",
     "@nestjs/core": "^9.4.3",
@@ -29,7 +28,8 @@
     "@nestjs/passport": "^10.0.1",
     "@nestjs/platform-express": "^9.4.3",
     "@prisma/client": "^5.1.1",
-    "bull": "^4.11.3",
+    "amqp-connection-manager": "^4.1.14",
+    "amqplib": "^0.10.4",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "passport": "^0.6.0",

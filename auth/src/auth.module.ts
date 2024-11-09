@@ -27,7 +27,7 @@ import tcpConfig from './config/tcp.config';
         useFactory: (configService: ConfigService) => ({
           transport: Transport.RMQ,
           options: {
-            urls: [configService.get<string>('rmq.url')], // Use ConfigService para obter a URL
+            urls: ['amqp://user:password@localhost:5672'],
             queue: 'authQueue',
             queueOptions: {
               durable: true,
@@ -41,7 +41,7 @@ import tcpConfig from './config/tcp.config';
         useFactory: (configService: ConfigService) => ({
           transport: Transport.RMQ,
           options: {
-            urls: [configService.get<string>('rmq.url')], // Use ConfigService para obter a URL
+            urls: ['amqp://user:password@localhost:5672'],
             queue: 'mailerQueue',
             queueOptions: {
               durable: true,
@@ -55,19 +55,18 @@ import tcpConfig from './config/tcp.config';
         useFactory: (configService: ConfigService) => ({
           transport: Transport.TCP,
           options: {
-            host: configService.get<string>('tcp.authServiceHost'), // Use ConfigService para obter o host
-            port: configService.get<number>('tcp.authServicePort'),  // Use ConfigService para obter a porta
+            host: configService.get<string>('tcp.authServiceHost'),
+            port: configService.get<number>('tcp.authServicePort'),
           },
         }),
         inject: [ConfigService],
       },
     ]),
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, AuthQueue],
   providers: [
     AuthService,
     PrismaService,
-    AuthQueue,
     MailerProducerService,
     ...provideRefreshRepository(),
     ...provideRecoveryRepository(),

@@ -2,52 +2,60 @@ import { Module } from '@nestjs/common';
 import { MailerController } from './mailer.controller';
 import { MailerService } from './mailer.service';
 import { MailerModule, MailerOptions } from '@nestjs-modules/mailer';
-import { ConfigModule, ConfigType } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import mailConfig from './config/mail.config';
 import { MailerQueue } from './queues/mailer-queue';
-import { BullModule } from '@nestjs/bull';
-import redisConfig from './config/redis.config';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { LoggerModule } from './shared/logger/logger.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './shared/interceptor/loggin.interceptor';
+import rmqConfig from './config/rmq.config';
 
 @Module({
   imports: [
     LoggerModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [mailConfig, rmqConfig],
+    }),
+    ClientsModule.registerAsync([
+      {
+        name: 'MAILER_QUEUE',
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: ['amqp://user:password@localhost:5672'],
+            queue: 'mailerQueue',
+            queueOptions: {
+              durable: true,
+            },
+          },
+        }),
+        inject: [ConfigService],
+      },
+    ]),
     MailerModule.forRootAsync({
-      imports: [ConfigModule.forRoot({ load: [mailConfig] })],
-      useFactory: (
-        configMail: ConfigType<typeof mailConfig>,
-      ): MailerOptions => ({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService): Promise<MailerOptions> => ({
         transport: {
-          host: configMail.host,
-          port: configMail.port,
+          host: configService.get<string>('mail.host'),
+          port: configService.get<number>('mail.port'),
           auth: {
-            user: configMail.auth.user,
-            pass: configMail.auth.password,
+            user: configService.get<number>('mail.auth.user'),
+            pass: configService.get<number>('mail.auth.password'),
           },
         },
       }),
-      inject: [mailConfig.KEY],
-    }),
-    BullModule.registerQueue({
-      name: 'mailerQueue',
-    }),
-    BullModule.forRootAsync({
-      imports: [ConfigModule.forRoot({ load: [redisConfig] })],
-      useFactory: (configRedis: ConfigType<typeof redisConfig>) => ({
-        redis: {
-          port: configRedis.port,
-          host: configRedis.host,
-        },
-      }),
-      inject: [redisConfig.KEY],
+      inject: [ConfigService],
     }),
   ],
-  controllers: [MailerController],
-  providers: [MailerService, MailerQueue, {
-    provide: APP_INTERCEPTOR,
-    useClass: LoggingInterceptor,
-  }],
+  controllers: [MailerController, MailerQueue],
+  providers: [
+    MailerService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
+  ],
 })
-export class AppModule { }
+export class AppModule {}

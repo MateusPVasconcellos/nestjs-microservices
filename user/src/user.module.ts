@@ -37,7 +37,7 @@ import tcpConfig from './config/tcp.config';
         useFactory: (configService: ConfigService) => ({
           transport: Transport.RMQ,
           options: {
-            urls: [configService.get<string>('rmq.url')],
+            urls: ['amqp://user:password@localhost:5672'],
             queue: 'authQueue',
             queueOptions: {
               durable: true,

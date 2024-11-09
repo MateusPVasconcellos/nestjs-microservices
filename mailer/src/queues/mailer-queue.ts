@@ -1,42 +1,46 @@
 import { MailerService } from '@nestjs-modules/mailer';
-import { OnQueueFailed, Process, Processor } from '@nestjs/bull';
-import { HttpException } from '@nestjs/common';
-import { Job } from 'bull';
+import { Controller } from '@nestjs/common';
+import { EventPattern } from '@nestjs/microservices';
 import { ActivateEmailEvent } from 'src/events/send-activate-email.event';
 import { RecoveryEmailEvent } from 'src/events/send-recovery-email.event';
 
-@Processor('mailerQueue')
+@Controller()
 class MailerQueue {
   constructor(private readonly mailService: MailerService) {}
 
-  @OnQueueFailed()
-  handler(job: Job, error: Error) {
-    console.log(`Fired Excption from ${job.name}:`, error);
-    throw new HttpException(error.message, 401);
+  @EventPattern('mailerQueue.sendActivateEmail')
+  async handleSendActivateEmail(data: ActivateEmailEvent) {
+    try {
+      await this.mailService.sendMail({
+        to: data.email,
+        from: 'Team G',
+        subject: 'Welcome!',
+        text: `Your registration was successful, click the link to activate your account: ${data.token}`,
+      });
+    } catch (error) {
+      this.handleError('mailerQueue.sendActivateEmail', error);
+    }
   }
 
-  @Process('mailerQueue.sendActivateEmail')
-  async sendActivateEmail(job: Job<ActivateEmailEvent>) {
-    const { data } = job;
-    await this.mailService.sendMail({
-      to: data.email,
-      from: 'Team G',
-      subject: 'Welcome!',
-      text:
-        'Your registration was successful, click in the link to activate your account.' +
-        data.token,
-    });
+  @EventPattern('mailerQueue.sendRecoveryEmail')
+  async handleSendRecoveryEmail(data: RecoveryEmailEvent) {
+    try {
+      await this.mailService.sendMail({
+        to: data.email,
+        from: 'Team G',
+        subject: 'Reset your password',
+        text: `Follow the link to reset your password: ${data.token}`,
+      });
+    } catch (error) {
+      this.handleError('mailerQueue.sendRecoveryEmail', error);
+    }
   }
 
-  @Process('mailerQueue.sendRecoveryEmail')
-  async sendRecoveryEmailJob(job: Job<RecoveryEmailEvent>) {
-    const { data } = job;
-    await this.mailService.sendMail({
-      to: data.email,
-      from: 'Team G',
-      subject: 'Reset your password',
-      text: 'Follow the link to reset your password' + data.token,
-    });
+  private handleError(context: string, error: Error) {
+    console.error(`Error in ${context}:`, error.message);
+    // Aqui você pode implementar lógica adicional de tratamento de erro, como reenvio ou logging
+    throw new Error(`Failed to process ${context}: ${error.message}`);
   }
 }
+
 export { MailerQueue };

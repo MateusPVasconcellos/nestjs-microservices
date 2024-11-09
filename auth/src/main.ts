@@ -11,21 +11,26 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.useGlobalFilters(new AllExceptionsFilter());
   app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.REDIS,
-  });
-
-  app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.TCP,
     options: {
       host: '127.0.0.1',
       port: 3002
     }
   });
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: ['amqp://user:password@localhost:5672'],
+      queue: 'authQueue',
+      queueOptions: {
+        durable: true,
+      },
+    },
+  });
 
   const prismaService = app.get(PrismaService);
   await prismaService.enableShutdownHooks(app);
   app.enableCors({ origin: '*', allowedHeaders: '*', methods: '*' });
-
   await app.startAllMicroservices();
   await app.listen(8000);
 }

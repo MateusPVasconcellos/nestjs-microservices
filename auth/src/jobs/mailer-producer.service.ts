@@ -12,7 +12,6 @@ class MailerProducerService {
   ) {
     this.loggerService.contextName = MailerProducerService.name;
   }
-
   async sendActivateEmail(event: ActivateEmailEvent) {
     this.client.emit('mailerQueue.sendActivateEmail', event);
     this.loggerService.info(`[mailerQueue.sendActivateEmail] ${JSON.stringify(event)}`);

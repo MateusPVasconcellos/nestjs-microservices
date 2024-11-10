@@ -7,7 +7,6 @@ import {
 import { Observable, throwError } from 'rxjs';
 import { LoggerService } from '../logger/logger.service';
 import { catchError, tap } from 'rxjs/operators';
-import { extractStackTrace } from '../utils/extract-stack-trace';
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
     constructor(private readonly loggerService: LoggerService) {
@@ -15,23 +14,21 @@ export class LoggingInterceptor implements NestInterceptor {
     }
 
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-        const request = context.switchToHttp().getRequest();
-        const { url } = request;
         const startTime = Date.now();
         return next
             .handle()
             .pipe(
                 catchError((error) => {
+                    this.loggerService.contextName = error?.response?.context;
                     const endTime = Date.now();
                     const elapsedTime = endTime - startTime;
                     const formattedStartTime = new Date(startTime).toLocaleString('pt-BR');
                     const formattedEndTime = new Date(endTime).toLocaleString('pt-BR');
                     const exception = {
-                        exception: error?.message,
-                        status: error?.response?.statusCode,
-                        stackTrace: extractStackTrace(error.stack),
+                        error,
+                        stackTrace: this.extractStackTrace(error.stack),
                     };
-                    this.loggerService.error(`[${url}] Start: ${formattedStartTime}, End: ${formattedEndTime}, Elapsed: ${elapsedTime}ms ${JSON.stringify(exception)}`);
+                    this.loggerService.error(`Start: ${formattedStartTime}, End: ${formattedEndTime}, Elapsed: ${elapsedTime}ms ${JSON.stringify(exception)}`);
                     return throwError(() => error);
                 }),
                 tap({
@@ -41,9 +38,13 @@ export class LoggingInterceptor implements NestInterceptor {
 
                         const formattedStartTime = new Date(startTime).toLocaleString('pt-BR');
                         const formattedEndTime = new Date(endTime).toLocaleString('pt-BR');
-                        this.loggerService.info(`[${url}] Start: ${formattedStartTime}, End: ${formattedEndTime}, Elapsed: ${elapsedTime}ms`);
+                        this.loggerService.info(`Start: ${formattedStartTime}, End: ${formattedEndTime}, Elapsed: ${elapsedTime}ms`);
                     },
                 }),
             );
+    }
+    private extractStackTrace(stack: string): string {
+        const match = / at (.+)/.exec(stack);
+        return match ? match[1] : stack;
     }
 }

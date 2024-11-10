@@ -1,4 +1,4 @@
-import { Controller, HttpException, Inject } from '@nestjs/common';
+import { Controller, HttpException, InternalServerErrorException, Inject } from '@nestjs/common';
 import { EventPattern } from '@nestjs/microservices';
 import { AuthService } from 'src/auth.service';
 import { GenerateRecoveryTokenEvent } from 'src/events/generate-recovery-token.event';
@@ -11,7 +11,6 @@ import {
   RecoveryRepository,
 } from 'src/repositories/interfaces/recovery.repository.interface';
 import { LoggerService } from 'src/shared/logger/logger.service';
-import { extractStackTrace } from 'src/shared/utils/extract-stack-trace';
 
 @Controller()
 class AuthQueue {
@@ -27,38 +26,41 @@ class AuthQueue {
 
   @EventPattern('authQueue.userCreated')
   async generateActivateToken(data: UserCreatedEvent) {
+    this.loggerService.info(`Event authQueue.userCreated received for email: ${data.email}`);
     try {
-      this.loggerService.info(`Event authQueue.userCreated received`);
       const token = this.appService.generateActivateToken(data.email);
-
       await this.mailerProducer.sendActivateEmail(
         new ActivateEmailEvent(data.email, data.name, token),
       );
+      this.loggerService.info(`Activation email sent to: ${data.email}`);
     } catch (error) {
-      this.handleError('authQueue.userCreated', error);
+      error.context = AuthQueue.name;
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException(error, 'Failed to generate activation token');
     }
   }
 
   @EventPattern('authQueue.resendActivateEmail')
   async regenerateActivateToken(data: UserCreatedEvent) {
+    this.loggerService.info(`Event authQueue.resendActivateEmail received for email: ${data.email}`);
     try {
-      this.loggerService.info(`Event authQueue.resendActivateEmail received`);
       const token = this.appService.generateActivateToken(data.email);
-
       await this.mailerProducer.sendActivateEmail(
         new ActivateEmailEvent(data.email, data.name, token),
       );
+      this.loggerService.info(`Activation email resent to: ${data.email}`);
     } catch (error) {
-      this.handleError('authQueue.resendActivateEmail', error);
+      error.context = AuthQueue.name;
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException(error, 'Failed to regenerate activation token');
     }
   }
 
   @EventPattern('authQueue.generateRecoveryToken')
   async generateRecoveryToken(data: GenerateRecoveryTokenEvent) {
+    this.loggerService.info(`Event authQueue.generateRecoveryToken received for user: ${data.user_id}`);
     try {
-      this.loggerService.info(`Event authQueue.generateRecoveryToken received`);
       const token = this.appService.generateRecoveryToken(data);
-
       await this.recoveryRepository.upsert({
         where: { user_id: data.user_id },
         create: { user_id: data.user_id, jti_recovery_token: token.jwtJti },
@@ -67,19 +69,12 @@ class AuthQueue {
       await this.mailerProducer.sendRecoveryEmail(
         new RecoveryEmailEvent(data.email, data.name, token.recoveryToken),
       );
+      this.loggerService.info(`Recovery email sent to: ${data.email}`);
     } catch (error) {
-      this.handleError('authQueue.generateRecoveryToken', error);
+      error.context = AuthQueue.name;
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException(error, 'Failed to generate recovery token');
     }
-  }
-
-  private handleError(eventName: string, error: any) {
-    const exception = {
-      exception: error?.message,
-      status: error?.response?.statusCode,
-      stackTrace: extractStackTrace(error.stack),
-    };
-    this.loggerService.error(`[${eventName}] ${JSON.stringify(exception)}`);
-    throw new HttpException(error.message, 500);
   }
 }
 

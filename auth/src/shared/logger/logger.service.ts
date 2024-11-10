@@ -11,13 +11,31 @@ export enum LogLevel {
 export class LoggerService {
     private _idempotencyKey: string;
     private _contextName = 'Default';
-    private readonly logger: Logger = createLogger({
-        format: format.json(),
-    });
+    private readonly logger: Logger;
 
     constructor() {
-        this.logger.configure({
-            transports: [this.logTransportConsole()],
+        this.logger = createLogger({
+            level: LogLevel.INFO, // Ajustável se necessário
+            format: format.combine(
+                format.timestamp(),
+                format.errors({ stack: true }), // Captura stack trace automaticamente
+                format.json()
+            ),
+            transports: [
+                new transports.Console({
+                    handleExceptions: true,
+                    format: format.combine(
+                        format.colorize({colors: {info: 'blue', error: 'red', warn: 'yellow'}}), // Coloriza logs no console
+                        format.printf((info) => {
+                            return `${info.timestamp} [${info.level}] [${info.meta.context}] ${info.message} ${
+                                info.meta ? JSON.stringify(info.meta) : ''
+                            }`;
+                        })
+                    ),
+                }),
+                // Adicione outros transportes, como para arquivo, se necessário
+                // new transports.File({ filename: 'application.log' })
+            ],
             exitOnError: false,
         });
     }
@@ -44,8 +62,8 @@ export class LoggerService {
             message: message,
             meta: {
                 context: this.contextName,
-                stackTrace,
                 idempotency: this._idempotencyKey,
+                stackTrace,
             },
         });
     }
@@ -63,21 +81,6 @@ export class LoggerService {
             level: LogLevel.INFO,
             message: message,
             meta: { context: this.contextName, idempotency: this._idempotencyKey },
-        });
-    }
-
-    private logTransportConsole() {
-        return new transports.Console({
-            handleExceptions: true,
-            format: format.combine(
-                format.timestamp(),
-                format.printf((info) => {
-                    return (
-                        `${info?.timestamp} [${info.level.toLocaleUpperCase()}] [${info?.meta?.context ?? ''
-                        }] ` + `${info?.message} ${JSON.stringify(info?.meta)}`
-                    );
-                }),
-            ),
         });
     }
 }

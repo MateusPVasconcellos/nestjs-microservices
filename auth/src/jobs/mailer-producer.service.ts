@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, InternalServerErrorException, HttpException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ActivateEmailEvent } from 'src/events/send-activate-email.event';
 import { RecoveryEmailEvent } from 'src/events/send-recovery-email.event';
@@ -12,14 +12,25 @@ class MailerProducerService {
   ) {
     this.loggerService.contextName = MailerProducerService.name;
   }
+
   async sendActivateEmail(event: ActivateEmailEvent) {
-    this.client.emit('mailerQueue.sendActivateEmail', event);
-    this.loggerService.info(`[mailerQueue.sendActivateEmail] ${JSON.stringify(event)}`);
+    try {
+      this.client.emit('mailerQueue.sendActivateEmail', event);
+      this.loggerService.info(`[mailerQueue.sendActivateEmail] ${JSON.stringify(event)}`);
+    } catch (error) {
+      error.context = MailerProducerService.name;
+      throw new InternalServerErrorException(error, 'Failed to send activation email');
+    }
   }
 
   async sendRecoveryEmail(event: RecoveryEmailEvent) {
-    this.client.emit('mailerQueue.sendRecoveryEmail', event);
-    this.loggerService.info(`[mailerQueue.sendRecoveryEmail] ${JSON.stringify(event)}`);
+    try {
+      this.client.emit('mailerQueue.sendRecoveryEmail', event);
+      this.loggerService.info(`[mailerQueue.sendRecoveryEmail] ${JSON.stringify(event)}`);
+    } catch (error) {
+      error.context = MailerProducerService.name;
+      throw new InternalServerErrorException(error, 'Failed to send recovery email');
+    }
   }
 }
 

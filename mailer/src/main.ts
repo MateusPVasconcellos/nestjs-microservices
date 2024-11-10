@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './mailer.module';
 import { ValidationPipe } from '@nestjs/common';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { LoggerService } from './shared/logger/logger.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,7 +15,8 @@ async function bootstrap() {
         durable: true,
       },
     },
-  });
+  },
+  { inheritAppConfig: true });
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.enableCors({ origin: '*', allowedHeaders: '*', methods: '*' });
   await app.startAllMicroservices();

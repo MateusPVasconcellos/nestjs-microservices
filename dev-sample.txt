@@ -1,0 +1,22 @@
+--criar arquivo tmux:
+nano ~/.tmux.conf
+--aplique:
+tmux source-file ~/.tmux.conf 
+
+<><><><>
+--permissao usuario grafana no host:
+sudo chown -R 1000:1000 ./.docker/grafana 
+
+<><><><>
+--redis Habilite o overcommit de memória no host:
+sudo nano /etc/sysctl.conf
+--adicione a seguinte linha ao final do arquivo:
+vm.overcommit_memory = 1
+--aplique:
+sudo sysctl -p
+
+<><><><>
+--permissao escrita pasta loki host:
+sudo chmod -R 777 ./.docker/loki  
+
+
